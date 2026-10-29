@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -87,4 +87,115 @@ footer {
 
   <label for="kind">نوع محتوا</label>
   <select id="kind">
-    <option value="social
+    <option value="social">پست شبکه اجتماعی</option>
+    <option value="video">ایده ویدئو</option>
+    <option value="product">توضیحات محصول</option>
+    <option value="ideas">ایده‌های محتوا</option>
+  </select>
+
+  <button onclick="makeContent()">ساخت محتوا</button>
+
+  <h2>پیش‌نویس شما</h2>
+  <div id="result">موضوعت را وارد کن تا پیش‌نویس ساخته شود.</div>
+  <button onclick="copyText()">کپی متن</button>
+
+  <section class="pricing">
+    <h2>پلن‌های قیمت‌گذاری</h2>
+    <p>پلن مناسب خودت را انتخاب کن.</p>
+
+    <div class="plan">
+      <h3>پلن رایگان</h3>
+      <div class="price">$0</div>
+      <p>استفاده از قالب‌های پایه برای شروع.</p>
+      <button onclick="showNotice()">شروع رایگان</button>
+    </div>
+
+    <div class="plan">
+      <h3>بسته اعتباری</h3>
+      <div class="price">$3</div>
+      <p>قیمت پیشنهادی برای ۳۰ اعتبار.</p>
+      <button onclick="showNotice()">خرید اعتبار</button>
+    </div>
+
+    <div class="plan">
+      <h3>اشتراک حرفه‌ای</h3>
+      <div class="price">$9 <small>/ ماه</small></div>
+      <p>قیمت پیشنهادی برای استفاده بیشتر از ابزارها.</p>
+      <button onclick="showNotice()">انتخاب پلن حرفه‌ای</button>
+    </div>
+
+    <p class="note">
+      قیمت‌ها آزمایشی هستند. خرید و پرداخت آنلاین هنوز فعال نیست.
+    </p>
+  </section>
+
+  <footer>ContentPilot Studio · نسخه اولیه</footer>
+</main>
+
+<script>
+function makeContent() {
+  const topic = document.getElementById('topic').value.trim();
+  const kind = document.getElementById('kind').value;
+
+  if (!topic) {
+    alert('لطفاً موضوع محتوا را وارد کن.');
+    return;
+  }
+
+  let text = '';
+
+  if (kind === 'social') {
+    text = `✨ موضوع: ${topic}
+
+امروز می‌خواهیم نکته‌های مهمی درباره ${topic} با شما به اشتراک بگذاریم.
+
+💡 یک نکته کاربردی:
+اطلاعات مفید و قابل استفاده درباره ${topic} ارائه کن.
+
+نظر شما چیست؟ در کامنت‌ها بنویسید.`;
+  } else if (kind === 'video') {
+    text = `🎬 ایده ویدئو: ${topic}
+
+۱. با یک سؤال جذاب شروع کن.
+۲. سه نکته کاربردی درباره ${topic} بگو.
+۳. یک مثال ساده ارائه بده.
+۴. مخاطب را به تعامل دعوت کن.`;
+  } else if (kind === 'product') {
+    text = `معرفی محصول: ${topic}
+
+این محصول برای افرادی مناسب است که به ${topic} علاقه دارند.
+
+مشخصات واقعی، مزایا، کاربردها و اطلاعات خرید را اضافه کن.
+
+قبل از انتشار، جزئیات محصول را بررسی کن.`;
+  } else {
+    text = `۵ ایده محتوا درباره ${topic}
+
+۱. راهنمای مبتدی‌ها
+۲. اشتباهات رایج
+۳. سه نکته کاربردی
+۴. پاسخ به پرسش‌های مخاطبان
+۵. معرفی یک تجربه واقعی`;
+  }
+
+  document.getElementById('result').textContent = text;
+}
+
+async function copyText() {
+  const text = document.getElementById('result').textContent;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('متن کپی شد.');
+  } catch (error) {
+    alert('متن را انتخاب کن و دستی کپی کن.');
+  }
+}
+
+function showNotice() {
+  alert('خرید آنلاین هنوز فعال نیست. این قابلیت بعداً راه‌اندازی می‌شود.');
+}
+</script>
+</body>
+</html>
+```
