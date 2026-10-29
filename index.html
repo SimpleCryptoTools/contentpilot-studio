@@ -1,53 +1,128 @@
+```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ContentPilot Studio</title>
+
 <style>
-body{font-family:Arial,sans-serif;background:#f3f4fb;color:#222;margin:0;padding:24px}
-main{max-width:700px;margin:auto;background:white;padding:24px;border-radius:18px}
-h1{color:#5145cd}
-textarea,input,select,button{box-sizing:border-box;width:100%;padding:12px;margin:8px 0;border-radius:9px;border:1px solid #ddd;font-size:16px}
-button{background:#5145cd;color:white;border:0;cursor:pointer}
-#result{white-space:pre-wrap;background:#f7f7fc;padding:16px;border-radius:10px;min-height:80px}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f4fb;
+  color: #222;
+  margin: 0;
+  padding: 20px;
+  line-height: 1.8;
+}
+
+main {
+  max-width: 700px;
+  margin: auto;
+  background: white;
+  padding: 24px;
+  border-radius: 18px;
+  box-shadow: 0 5px 25px #0000000a;
+}
+
+h1 {
+  color: #5145cd;
+  margin-top: 0;
+}
+
+h2 {
+  color: #39318f;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 9px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+button {
+  background: #5145cd;
+  color: white;
+  border: 0;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #4035ad;
+}
+
+#result {
+  white-space: pre-wrap;
+  background: #f7f7fc;
+  padding: 16px;
+  border-radius: 10px;
+  min-height: 80px;
+  overflow-wrap: anywhere;
+}
+
+.pricing {
+  margin-top: 28px;
+  padding: 20px;
+  background: #f3f2ff;
+  border-radius: 16px;
+}
+
+.plan {
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  margin: 12px 0;
+  border: 1px solid #e5e2ff;
+}
+
+.price {
+  color: #5145cd;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.note {
+  color: #666;
+  font-size: 13px;
+}
+
+footer {
+  text-align: center;
+  color: #777;
+  font-size: 13px;
+  margin-top: 24px;
+}
 </style>
 </head>
+
 <body>
 <main>
-<h1>ContentPilot Studio</h1>
-<p>ایده‌ات را وارد کن و پیش‌نویس محتوا بساز.</p>
-<label>موضوع محتوا</label>
-<input id="topic" placeholder="مثلاً فروشگاه لباس">
-<label>نوع محتوا</label>
-<select id="kind">
-<option>پست شبکه اجتماعی</option>
-<option>ایده ویدئو</option>
-<option>توضیحات محصول</option>
-<option>ایده‌های محتوا</option>
-</select>
-<button onclick="makeContent()">ساخت محتوا</button>
-<h3>پیش‌نویس شما</h3>
-<div id="result">محتوای ساخته‌شده اینجا نمایش داده می‌شود.</div>
-<button onclick="copyText()">کپی متن</button>
-</main>
-<script>
-function makeContent(){
-const t=document.getElementById('topic').value.trim();
-const k=document.getElementById('kind').value;
-if(!t){alert('لطفاً موضوع را وارد کن');return;}
-let s='';
-if(k==='پست شبکه اجتماعی')s=`✨ درباره ${t}\n\nامروز می‌خواهیم نکته‌های مهمی درباره ${t} با شما به اشتراک بگذاریم.\n\nنظر شما چیست؟ در کامنت‌ها بنویسید.`;
-else if(k==='ایده ویدئو')s=`ایده ویدئو: ${t}\n\n۱. با یک سؤال جذاب شروع کن.\n۲. سه نکته کاربردی درباره ${t} بگو.\n۳. در پایان مخاطب را به تعامل دعوت کن.`;
-else if(k==='توضیحات محصول')s=`معرفی ${t}\n\nبا جزئیات واقعی محصول ${t} آشنا شوید و بررسی کنید که آیا برای نیازهای شما مناسب است یا نه. مشخصات و مزایای واقعی را اضافه کنید.`;
-else s=`۵ ایده محتوا درباره ${t}\n\n۱. راهنمای مبتدی‌ها\n۲. اشتباهات رایج\n۳. سه نکته کاربردی\n۴. پاسخ به پرسش‌های مخاطبان\n۵. معرفی یک تجربه واقعی`;
-document.getElementById('result').textContent=s;
-}
-function copyText(){
-navigator.clipboard.writeText(document.getElementById('result').textContent)
-.then(()=>alert('متن کپی شد'))
-.catch(()=>alert('متن را دستی انتخاب و کپی کن'));
-}
-</script>
-</body>
-</html>
+  <h1>ContentPilot Studio</h1>
+  <p>دستیار سادهٔ تو برای ایده‌پردازی و تولید پیش‌نویس محتوا.</p>
+
+  <label for="topic">موضوع محتوا</label>
+  <input id="topic" placeholder="مثلاً فروشگاه لباس">
+
+  <label for="kind">نوع محتوا</label>
+  <select id="kind">
+    <option value="social">پست شبکه اجتماعی</option>
+    <option value="video">ایده ویدئو</option>
+    <option value="product">توضیحات محصول</option>
+    <option value="ideas">ایده‌های محتوا</option>
+  </select>
+
+  <button onclick="makeContent()">ساخت محتوا</button>
+
+  <h2>پیش‌ن
