@@ -41,6 +41,10 @@ button {
   cursor: pointer;
 }
 button:hover { background: #4035ad; }
+button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
 #result {
   white-space: pre-wrap;
   background: #f7f7fc;
@@ -79,11 +83,12 @@ footer {
 <body>
 <main>
   <h1>ContentPilot Studio</h1>
-  <p>دستیار تو برای ایده‌پردازی و تولید پیش‌نویس محتوا.</p>
+  <p>دستیار هوشمند تو برای ایده‌پردازی و تولید محتوا.</p>
 
   <h2>ساخت محتوا</h2>
+
   <label for="topic">موضوع محتوا</label>
-  <input id="topic" placeholder="مثلاً فروشگاه لباس">
+  <input id="topic" maxlength="500" placeholder="مثلاً فروشگاه لباس">
 
   <label for="kind">نوع محتوا</label>
   <select id="kind">
@@ -93,10 +98,10 @@ footer {
     <option value="ideas">ایده‌های محتوا</option>
   </select>
 
-  <button onclick="makeContent()">ساخت محتوا</button>
+  <button id="generateButton" onclick="makeContent()">ساخت محتوا</button>
 
   <h2>پیش‌نویس شما</h2>
-  <div id="result">موضوعت را وارد کن تا پیش‌نویس ساخته شود.</div>
+  <div id="result">موضوعت را وارد کن تا محتوای اختصاصی تولید شود.</div>
   <button onclick="copyText()">کپی متن</button>
 
   <section class="pricing">
@@ -106,7 +111,7 @@ footer {
     <div class="plan">
       <h3>پلن رایگان</h3>
       <div class="price">$0</div>
-      <p>استفاده از قالب‌های پایه برای شروع.</p>
+      <p>استفاده از ابزار برای شروع.</p>
       <button onclick="showNotice()">شروع رایگان</button>
     </div>
 
@@ -120,7 +125,7 @@ footer {
     <div class="plan">
       <h3>اشتراک حرفه‌ای</h3>
       <div class="price">$9 <small>/ ماه</small></div>
-      <p>قیمت پیشنهادی برای استفاده بیشتر از ابزارها.</p>
+      <p>قیمت پیشنهادی برای استفاده بیشتر.</p>
       <button onclick="showNotice()">انتخاب پلن حرفه‌ای</button>
     </div>
 
@@ -133,52 +138,56 @@ footer {
 </main>
 
 <script>
-function makeContent() {
+async function makeContent() {
   const topic = document.getElementById('topic').value.trim();
   const kind = document.getElementById('kind').value;
+  const resultBox = document.getElementById('result');
+  const button = document.getElementById('generateButton');
 
   if (!topic) {
     alert('لطفاً موضوع محتوا را وارد کن.');
     return;
   }
 
-  let text = '';
+  button.disabled = true;
+  button.textContent = 'در حال تولید محتوا...';
+  resultBox.textContent = 'هوش مصنوعی در حال نوشتن است. لطفاً صبر کن...';
 
-  if (kind === 'social') {
-    text = `✨ موضوع: ${topic}
+  try {
+    const response = await fetch(
+      'https://contentpilot-ai.mohannahaddadi363.workers.dev',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          topic: topic,
+          kind: kind
+        })
+      }
+    );
 
-امروز می‌خواهیم نکته‌های مهمی درباره ${topic} با شما به اشتراک بگذاریم.
+    const data = await response.json();
 
-💡 یک نکته کاربردی:
-اطلاعات مفید و قابل استفاده درباره ${topic} ارائه کن.
+    if (!response.ok) {
+      throw new Error(data.error || 'خطا در تولید محتوا');
+    }
 
-نظر شما چیست؟ در کامنت‌ها بنویسید.`;
-  } else if (kind === 'video') {
-    text = `🎬 ایده ویدئو: ${topic}
+    if (!data.text) {
+      throw new Error('پاسخی از هوش مصنوعی دریافت نشد.');
+    }
 
-۱. با یک سؤال جذاب شروع کن.
-۲. سه نکته کاربردی درباره ${topic} بگو.
-۳. یک مثال ساده ارائه بده.
-۴. مخاطب را به تعامل دعوت کن.`;
-  } else if (kind === 'product') {
-    text = `معرفی محصول: ${topic}
+    resultBox.textContent = data.text;
 
-این محصول برای افرادی مناسب است که به ${topic} علاقه دارند.
-
-مشخصات واقعی، مزایا، کاربردها و اطلاعات خرید را اضافه کن.
-
-قبل از انتشار، جزئیات محصول را بررسی کن.`;
-  } else {
-    text = `۵ ایده محتوا درباره ${topic}
-
-۱. راهنمای مبتدی‌ها
-۲. اشتباهات رایج
-۳. سه نکته کاربردی
-۴. پاسخ به پرسش‌های مخاطبان
-۵. معرفی یک تجربه واقعی`;
+  } catch (error) {
+    console.error(error);
+    resultBox.textContent =
+      'خطا در اتصال به هوش مصنوعی:\n' + error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = 'ساخت محتوا';
   }
-
-  document.getElementById('result').textContent = text;
 }
 
 async function copyText() {
@@ -198,4 +207,3 @@ function showNotice() {
 </script>
 </body>
 </html>
-```
