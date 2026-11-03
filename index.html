@@ -5,7 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#10162b">
-  <meta name="description" content="ContentPilot Studio؛ دستیار هوشمند فارسی برای ایده‌پردازی و تولید محتوای حرفه‌ای.">
+  <meta name="description" content="ContentPilot Studio - AI-powered content and image creation for creators and businesses.">
+  <meta name="robots" content="index,follow">
+  <meta property="og:title" content="ContentPilot Studio">
+  <meta property="og:description" content="Create professional content and images with AI.">
+  <meta property="og:type" content="website">
   <title>ContentPilot Studio | دستیار هوشمند تولید محتوا</title>
 
   <style>
@@ -21,13 +25,9 @@
       --radius: 20px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
@@ -40,30 +40,19 @@
       line-height: 1.9;
     }
 
-    button, input, textarea, select {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
 
     .container {
       width: min(1120px, calc(100% - 36px));
-      margin: auto;
+      margin-inline: auto;
     }
 
-    /* Header */
-
     header {
-      padding: 20px 0;
+      padding: 17px 0;
       border-bottom: 1px solid var(--border);
-      background: rgba(11,16,32,.75);
+      background: rgba(11,16,32,.86);
       backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
@@ -74,16 +63,17 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
+      gap: 18px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 19px;
+      gap: 11px;
+      font-size: 18px;
       font-weight: 800;
       direction: ltr;
+      white-space: nowrap;
     }
 
     .brand-icon {
@@ -100,28 +90,35 @@
 
     .nav-links {
       display: flex;
-      gap: 26px;
+      gap: 23px;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    .nav-links a:hover {
-      color: white;
+    .nav-links a:hover { color: white; }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
     }
 
-    .nav-button {
-      padding: 9px 18px;
+    .language-button, .nav-button {
+      padding: 8px 14px;
       border: 1px solid var(--border);
       border-radius: 12px;
       color: white;
       background: var(--surface);
-      font-size: 13px;
+      font-size: 12px;
     }
 
-    /* Hero */
+    .language-button {
+      color: #c5bcff;
+      border-color: rgba(139,124,255,.35);
+    }
 
     .hero {
-      padding: 82px 0 60px;
+      padding: 77px 0 52px;
       text-align: center;
     }
 
@@ -160,36 +157,33 @@
     }
 
     .hero-description {
-      max-width: 650px;
+      max-width: 680px;
       margin: 0 auto;
       color: var(--muted);
-      font-size: 16px;
+      font-size: 15px;
     }
 
     .hero-actions {
-      margin-top: 28px;
+      margin-top: 27px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 13px;
+      gap: 12px;
       flex-wrap: wrap;
     }
 
     .primary-button {
       border: 0;
       border-radius: 13px;
-      padding: 12px 24px;
+      padding: 12px 23px;
       color: #fff;
       font-weight: 700;
       background: linear-gradient(120deg, #8876ff, #6857e8);
       box-shadow: 0 8px 25px rgba(112,91,238,.25);
-      transition: transform .2s, box-shadow .2s;
+      transition: transform .2s;
     }
 
-    .primary-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(112,91,238,.35);
-    }
+    .primary-button:hover { transform: translateY(-2px); }
 
     .secondary-button {
       border: 1px solid var(--border);
@@ -199,17 +193,15 @@
       background: var(--surface);
     }
 
-    /* Features */
-
     .features {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 15px;
-      margin: 15px 0 70px;
+      margin: 12px auto 65px;
     }
 
     .feature {
-      padding: 18px;
+      padding: 17px;
       display: flex;
       align-items: center;
       gap: 13px;
@@ -229,44 +221,84 @@
       font-size: 21px;
     }
 
-    .feature strong {
-      display: block;
-      font-size: 14px;
-    }
-
-    .feature small {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    /* Main generator */
+    .feature strong { display: block; font-size: 14px; }
+    .feature small { color: var(--muted); font-size: 11px; }
 
     .section-heading {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 28px;
     }
 
     .section-heading h2 {
-      font-size: 29px;
+      font-size: 28px;
       margin: 0 0 7px;
     }
 
     .section-heading p {
       margin: 0;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
+    }
+
+    .samples-section { margin-bottom: 75px; }
+
+    .samples-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 17px;
+    }
+
+    .sample-card {
+      padding: 21px;
+      border: 1px solid rgba(139,124,255,.24);
+      border-radius: 18px;
+      background: linear-gradient(145deg,#1b2740,#141c31);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sample-icon { font-size: 29px; }
+
+    .sample-card h3 {
+      margin: 0;
+      font-size: 15px;
+      color: #c5bcff;
+    }
+
+    .sample-preview {
+      padding: 13px;
+      border-radius: 11px;
+      background: rgba(8,13,26,.5);
+      color: #dce3f5;
+      font-size: 12px;
+      line-height: 2;
+      flex: 1;
+    }
+
+    .sample-preview p { margin: 5px 0; }
+
+    .sample-card button {
+      width: 100%;
+      border: 0;
+      border-radius: 11px;
+      padding: 10px;
+      background: linear-gradient(120deg,#8876ff,#6857e8);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
     }
 
     .generator {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 22px;
+      gap: 21px;
       align-items: start;
-      margin-bottom: 85px;
+      margin-bottom: 75px;
     }
 
     .panel {
-      padding: 27px;
+      padding: 25px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       background: linear-gradient(145deg, rgba(27,39,64,.95), rgba(20,28,49,.95));
@@ -277,7 +309,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .panel-title-icon {
@@ -290,21 +322,13 @@
       font-size: 19px;
     }
 
-    .panel-title h3 {
-      margin: 0;
-      font-size: 17px;
-    }
-
-    .panel-title p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
+    .panel-title h3 { margin: 0; font-size: 16px; }
+    .panel-title p { margin: 0; color: var(--muted); font-size: 11px; }
 
     label {
       display: block;
       margin-bottom: 8px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
     }
 
@@ -319,110 +343,69 @@
     }
 
     textarea {
-      min-height: 145px;
-      padding: 14px;
+      min-height: 125px;
+      padding: 13px;
       resize: vertical;
     }
 
-    textarea::placeholder {
-      color: #77839f;
-    }
-
-    select {
-      padding: 13px;
-      appearance: auto;
-    }
+    textarea::placeholder { color: #77839f; }
+    select { padding: 12px; }
 
     textarea:focus, select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(139,124,255,.12);
     }
 
-    option {
-      background: #141c31;
-      color: white;
-    }
+    option { background: #141c31; color: white; }
 
-    .field {
-      margin-bottom: 20px;
-    }
+    .field { margin-bottom: 18px; }
 
     .field-meta {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-top: 6px;
+      margin-top: 5px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
     }
 
     .examples {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
+      gap: 7px;
+      margin-top: 10px;
     }
 
     .example-chip {
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 5px 11px;
+      padding: 5px 10px;
       color: #c5bcff;
       background: rgba(139,124,255,.07);
-      font-size: 11px;
-    }
-
-    .example-chip:hover {
-      background: rgba(139,124,255,.2);
+      font-size: 10px;
     }
 
     .generate-button {
       width: 100%;
-      min-height: 50px;
-      margin-top: 5px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 9px;
-      font-size: 15px;
+      min-height: 49px;
+      margin-top: 4px;
+      font-size: 14px;
     }
 
-    .generate-button:disabled {
-      opacity: .65;
+    .generate-button:disabled, .image-create:disabled {
+      opacity: .6;
       cursor: wait;
-      transform: none;
-    }
-
-    .spinner {
-      width: 17px;
-      height: 17px;
-      border: 2px solid rgba(255,255,255,.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      display: none;
-    }
-
-    .loading .spinner {
-      display: inline-block;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
 
     .notice {
       display: none;
-      margin-top: 14px;
+      margin-top: 13px;
       padding: 11px 13px;
       border-radius: 11px;
       font-size: 12px;
       line-height: 1.8;
     }
 
-    .notice.visible {
-      display: block;
-    }
+    .notice.visible { display: block; }
 
     .notice.error {
       color: #ffc0c0;
@@ -436,30 +419,28 @@
       border: 1px solid rgba(68,214,189,.2);
     }
 
-    /* Output */
-
     .output-panel {
-      min-height: 410px;
+      min-height: 390px;
       display: flex;
       flex-direction: column;
     }
 
     .output-content {
       flex: 1;
-      min-height: 250px;
-      padding: 17px;
+      min-height: 245px;
+      padding: 16px;
       border: 1px dashed rgba(255,255,255,.16);
       border-radius: 13px;
       background: rgba(8,13,26,.35);
       color: #e5e9f5;
-      font-size: 14px;
+      font-size: 13px;
       line-height: 2.1;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
 
     .output-placeholder {
-      min-height: 220px;
+      min-height: 210px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -468,25 +449,14 @@
       text-align: center;
     }
 
-    .output-placeholder span {
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
-
-    .output-placeholder strong {
-      color: #d9def0;
-      font-size: 14px;
-    }
-
-    .output-placeholder small {
-      margin-top: 5px;
-      font-size: 12px;
-    }
+    .output-placeholder span { font-size: 38px; }
+    .output-placeholder strong { color: #d9def0; font-size: 13px; }
+    .output-placeholder small { margin-top: 5px; font-size: 11px; }
 
     .output-toolbar {
       display: flex;
-      gap: 10px;
-      margin-top: 15px;
+      gap: 9px;
+      margin-top: 14px;
     }
 
     .tool-button {
@@ -496,18 +466,91 @@
       border-radius: 11px;
       color: white;
       background: var(--surface2);
+      font-size: 11px;
+    }
+
+    .tool-button:disabled { opacity: .4; cursor: not-allowed; }
+
+    .image-studio { margin: 25px auto 75px; }
+
+    .image-panel {
+      padding: 27px;
+      border: 1px solid rgba(139,124,255,.3);
+      border-radius: 22px;
+      background: linear-gradient(145deg,#1b2740,#141c31);
+      box-shadow: 0 15px 45px rgba(0,0,0,.15);
+    }
+
+    .image-panel h2 { margin: 0 0 7px; font-size: 25px; }
+    .image-description { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .image-panel label { display: block; margin: 15px 0 7px; }
+
+    .image-panel textarea, .image-panel select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #0f172a;
+      color: white;
+    }
+
+    .image-panel textarea { min-height: 95px; }
+
+    .image-create {
+      width: 100%;
+      margin-top: 17px;
+      min-height: 48px;
+      border: 0;
+      border-radius: 12px;
+      background: linear-gradient(120deg,#8876ff,#6857e8);
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .image-error {
+      display: none;
+      margin-top: 13px;
+      padding: 11px;
+      border-radius: 10px;
+      color: #ffc0c0;
+      background: rgba(255,83,83,.1);
       font-size: 12px;
     }
 
-    .tool-button:disabled {
-      opacity: .4;
-      cursor: not-allowed;
+    .image-result {
+      margin-top: 22px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: #0f172a;
     }
 
-    /* Pricing */
+    .image-result img {
+      display: block;
+      width: 100%;
+      max-height: 600px;
+      object-fit: contain;
+      border-radius: 11px;
+      background: #080d1a;
+    }
+
+    .image-result[hidden] { display: none; }
+
+    .image-download {
+      display: inline-block;
+      margin-top: 13px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: var(--secondary);
+      color: #091522;
+      font-weight: bold;
+      font-size: 12px;
+    }
 
     .pricing {
-      padding: 65px 0 80px;
+      padding: 65px 0 75px;
       border-top: 1px solid var(--border);
       background: rgba(14,21,39,.5);
     }
@@ -515,12 +558,11 @@
     .plans {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
+      gap: 17px;
     }
 
     .plan {
-      position: relative;
-      padding: 27px;
+      padding: 25px;
       border: 1px solid var(--border);
       border-radius: 19px;
       background: var(--surface);
@@ -538,79 +580,57 @@
       color: #c5bcff;
       background: rgba(139,124,255,.15);
       font-size: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 9px;
     }
 
-    .plan h3 {
-      margin: 4px 0;
-      font-size: 17px;
-    }
-
-    .plan-description {
-      color: var(--muted);
-      min-height: 48px;
-      font-size: 12px;
-    }
+    .plan h3 { margin: 4px 0; font-size: 16px; }
+    .plan-description { color: var(--muted); min-height: 45px; font-size: 11px; }
 
     .price {
-      margin: 18px 0;
-      font-size: 34px;
+      margin: 17px 0;
+      font-size: 30px;
       font-weight: 900;
-      direction: ltr;
-      text-align: right;
     }
 
-    .price small {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 400;
-    }
-
-    .plan ul {
-      padding-right: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 2.5;
-    }
+    .price small { color: var(--muted); font-size: 11px; font-weight: 400; }
+    .plan ul { padding-inline-start: 19px; color: var(--muted); font-size: 11px; line-height: 2.5; }
 
     .plan-button {
       width: 100%;
       margin-top: 10px;
+      font-size: 12px;
     }
 
     .payment-note {
-      margin: 24px 0 0;
+      margin: 23px 0 0;
       text-align: center;
       color: #e5c994;
-      font-size: 12px;
+      font-size: 11px;
     }
 
-    /* Footer */
-
     footer {
-      padding: 25px 0;
+      padding: 23px 0;
       border-top: 1px solid var(--border);
       color: var(--muted);
       text-align: center;
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .toast {
       position: fixed;
       bottom: 22px;
-      right: 50%;
+      inset-inline-start: 50%;
       transform: translateX(50%) translateY(20px);
       padding: 11px 18px;
       border: 1px solid var(--border);
       border-radius: 12px;
       background: #202c45;
       color: white;
-      font-size: 13px;
+      font-size: 12px;
       opacity: 0;
       pointer-events: none;
       transition: .25s;
       z-index: 50;
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
     }
 
     .toast.show {
@@ -618,899 +638,901 @@
       transform: translateX(50%) translateY(0);
     }
 
-    /* Responsive */
-
-    @media (max-width: 800px) {
-      .generator {
-        grid-template-columns: 1fr;
-      }
-
-      .features {
-        grid-template-columns: 1fr;
-        margin-bottom: 55px;
-      }
-
-      .plans {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        padding-top: 58px;
-      }
+    [dir="ltr"] .toast {
+      transform: translateX(-50%) translateY(20px);
     }
 
-    @media (max-width: 520px) {
-      .container {
-        width: min(100% - 24px, 1120px);
-      }
+    [dir="ltr"] .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
 
-      .nav-links {
-        display: none;
-      }
+    @media(max-width:800px) {
+      .generator { grid-template-columns: 1fr; }
+      .features { grid-template-columns: 1fr; }
+      .plans { grid-template-columns: 1fr; }
+      .samples-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 55px; }
+    }
 
-      .brand {
-        font-size: 16px;
-      }
-
-      h1 {
-        font-size: 31px;
-      }
-
-      .hero-description {
-        font-size: 14px;
-      }
-
-      .panel {
-        padding: 19px;
-      }
-
-      .section-heading h2 {
-        font-size: 24px;
-      }
-
-      .hero-actions {
-        flex-direction: column;
-      }
-
-      .hero-actions a,
-      .hero-actions button {
-        width: 100%;
-      }
+    @media(max-width:520px) {
+      .container { width: min(100% - 24px, 1120px); }
+      .nav-links { display: none; }
+      .brand { font-size: 15px; }
+      .brand-icon { width: 37px; height: 37px; }
+      h1 { font-size: 30px; }
+      .hero-description { font-size: 13px; }
+      .panel, .image-panel { padding: 18px; }
+      .section-heading h2 { font-size: 23px; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions a { width: 100%; }
     }
   </style>
 </head>
 
 <body>
+<header>
+  <div class="container nav">
+    <a class="brand" href="#">
+      <span class="brand-icon">✦</span>
+      <span>ContentPilot Studio</span>
+    </a>
 
-  <header>
-    <div class="container nav">
-      <a class="brand" href="#">
-        <span class="brand-icon">✦</span>
-        <span>ContentPilot Studio</span>
-      </a>
+    <nav class="nav-links">
+      <a href="#generator" data-i18n="navText">ساخت محتوا</a>
+      <a href="#imageStudio" data-i18n="navImage">تولید تصویر</a>
+      <a href="#pricing" data-i18n="navPricing">تعرفه‌ها</a>
+    </nav>
 
-      <nav class="nav-links">
-        <a href="#generator">ساخت محتوا</a>
-        <a href="#features">امکانات</a>
-        <a href="#pricing">تعرفه‌ها</a>
-      </nav>
-
-      <a class="nav-button" href="#generator">شروع رایگان ←</a>
+    <div class="nav-actions">
+      <button class="language-button" id="languageButton" type="button">English</button>
+      <a class="nav-button" href="#generator" data-i18n="start">شروع رایگان</a>
     </div>
-  </header>
-
-  <main>
-    <section class="hero">
-      <div class="container">
-        <div class="eyebrow">
-          <span></span>
-          دستیار هوشمند تولید محتوا
-        </div>
-
-        <h1>
-          ایده‌هایت را به محتوای
-          <span class="gradient-text">حرفه‌ای</span>
-          تبدیل کن
-        </h1>
-
-        <p class="hero-description">
-          با کمک هوش مصنوعی، سریع‌تر ایده‌پردازی کن و برای شبکه‌های اجتماعی،
-          معرفی محصولات و ویدئوهای خود محتوای اختصاصی بساز.
-        </p>
-
-        <div class="hero-actions">
-          <a class="primary-button" href="#generator">شروع تولید محتوا</a>
-          <a class="secondary-button" href="#features">آشنایی با امکانات</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="container features" id="features">
-      <div class="feature">
-        <div class="feature-icon">✍️</div>
-        <div>
-          <strong>تولید محتوای سریع</strong>
-          <small>از ایده تا متن آماده در چند لحظه</small>
-        </div>
-      </div>
-
-      <div class="feature">
-        <div class="feature-icon">💡</div>
-        <div>
-          <strong>ایده‌پردازی خلاقانه</strong>
-          <small>برای موضوعات و قالب‌های مختلف</small>
-        </div>
-      </div>
-
-      <div class="feature">
-        <div class="feature-icon">📋</div>
-        <div>
-          <strong>کپی آسان متن</strong>
-          <small>خروجی آماده استفاده و ویرایش</small>
-        </div>
-      </div>
-    </section>
-
-<style>
-  .samples-section {
-    margin: 20px auto 75px;
-  }
-
-  .samples-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-  }
-
-  .sample-card {
-    padding: 23px;
-    border: 1px solid rgba(139,124,255,.25);
-    border-radius: 18px;
-    background: linear-gradient(145deg,#1b2740,#141c31);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .sample-icon {
-    font-size: 30px;
-  }
-
-  .sample-card h3 {
-    margin: 0;
-    font-size: 16px;
-    color: #c5bcff;
-  }
-
-  .sample-preview {
-    padding: 13px;
-    border-radius: 11px;
-    background: rgba(8,13,26,.5);
-    color: #dce3f5;
-    font-size: 12px;
-    line-height: 2;
-    flex: 1;
-  }
-
-  .sample-card button {
-    width: 100%;
-    border: 0;
-    border-radius: 11px;
-    padding: 11px;
-    background: linear-gradient(120deg,#8876ff,#6857e8);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .sample-card button:hover {
-    opacity: .9;
-  }
-
-  @media(max-width:800px) {
-    .samples-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
-
-<section class="container samples-section" id="samples">
-  <div class="section-heading">
-    <h2>نمونه‌هایی از قدرت ContentPilot ✨</h2>
-    <p>قبل از خرید، نمونه خروجی‌ها را ببین و ابزار را رایگان امتحان کن.</p>
   </div>
+</header>
 
-  <div class="samples-grid">
-
-    <article class="sample-card">
-      <div class="sample-icon">📱</div>
-      <h3>نمونه پست اینستاگرام</h3>
-      <div class="sample-preview">
-        <strong>۵ راه برای افزایش جذابیت صفحه اینستاگرام</strong>
-        <p>محتوای خوب فقط زیبا نیست؛ باید برای مخاطب ارزش ایجاد کند. با شناخت نیاز مخاطب، تصویر مناسب و متن جذاب، صفحه خودت را حرفه‌ای‌تر کن.</p>
-        <p>✨ از امروز با یک ایده تازه شروع کن!</p>
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="eyebrow">
+        <span></span>
+        <span data-i18n="eyebrow">دستیار هوشمند تولید محتوا</span>
       </div>
-      <button onclick="useContentSample('پنج راه کاربردی برای جذاب‌تر کردن صفحه اینستاگرام','social')">
-        ساخت محتوای مشابه
-      </button>
-    </article>
 
-    <article class="sample-card">
-      <div class="sample-icon">🛍️</div>
-      <h3>نمونه معرفی محصول</h3>
-      <div class="sample-preview">
-        <strong>معرفی شمع دست‌ساز معطر</strong>
-        <p>فضای خانه را با رایحه‌ای دلنشین و نور گرم شمع‌های دست‌ساز زیباتر کن. انتخابی جذاب برای هدیه دادن و ساختن لحظه‌های آرام.</p>
-        <p>🎁 زیبایی یک هدیه متفاوت را تجربه کن.</p>
+      <h1>
+        <span data-i18n="heroLine1">ایده‌هایت را به محتوای</span>
+        <span class="gradient-text" data-i18n="heroHighlight">حرفه‌ای</span>
+        <span data-i18n="heroLine2">تبدیل کن</span>
+      </h1>
+
+      <p class="hero-description" id="heroDescription">
+        با کمک هوش مصنوعی، سریع‌تر ایده‌پردازی کن و محتوای اختصاصی بساز.
+      </p>
+
+      <div class="hero-actions">
+        <a class="primary-button" href="#generator" data-i18n="startCreating">شروع تولید محتوا</a>
+        <a class="secondary-button" href="#samples" data-i18n="seeSamples">دیدن نمونه‌ها</a>
       </div>
-      <button onclick="useContentSample('معرفی و تبلیغ یک شمع دست‌ساز معطر','product')">
-        ساخت محتوای مشابه
-      </button>
-    </article>
+    </div>
+  </section>
 
-    <article class="sample-card">
-      <div class="sample-icon">🎬</div>
-      <h3>نمونه سناریوی ویدئو</h3>
-      <div class="sample-preview">
-        <strong>موضوع: شروع یک روز پرانرژی</strong>
-        <p>صحنه اول: نمای نزدیک از آماده‌کردن قهوه.</p>
-        <p>صحنه دوم: نور صبح و فنجان قهوه روی میز.</p>
-        <p>گوینده: روزت را با یک لحظه آرامش شروع کن!</p>
+  <section class="container features">
+    <div class="feature">
+      <div class="feature-icon">✍️</div>
+      <div>
+        <strong data-i18n="feature1Title">تولید محتوای سریع</strong>
+        <small data-i18n="feature1Desc">از ایده تا متن آماده</small>
       </div>
-      <button onclick="useContentSample('سناریوی ویدئوی کوتاه درباره شروع یک روز پرانرژی','video')">
-        ساخت محتوای مشابه
-      </button>
-    </article>
+    </div>
 
-  </div>
-</section>
+    <div class="feature">
+      <div class="feature-icon">🎨</div>
+      <div>
+        <strong data-i18n="feature2Title">تولید تصویر هوشمند</strong>
+        <small data-i18n="feature2Desc">ساخت تصاویر تبلیغاتی</small>
+      </div>
+    </div>
 
-<script>
-  function useContentSample(topic, kind) {
-    const topicInput = document.getElementById("topic");
-    const kindSelect = document.getElementById("kind");
+    <div class="feature">
+      <div class="feature-icon">📋</div>
+      <div>
+        <strong data-i18n="feature3Title">خروجی قابل استفاده</strong>
+        <small data-i18n="feature3Desc">کپی و ذخیره آسان</small>
+      </div>
+    </div>
+  </section>
 
-    topicInput.value = topic;
-    kindSelect.value = kind;
+  <section class="container samples-section" id="samples">
+    <div class="section-heading">
+      <h2 data-i18n="samplesTitle">نمونه‌هایی از قدرت ContentPilot</h2>
+      <p data-i18n="samplesSubtitle">قبل از خرید، نمونه خروجی‌ها را ببین و ابزار را امتحان کن.</p>
+    </div>
 
-    topicInput.dispatchEvent(new Event("input"));
+    <div class="samples-grid">
+      <article class="sample-card">
+        <div class="sample-icon">📱</div>
+        <h3 data-i18n="sample1Title">نمونه پست شبکه اجتماعی</h3>
+        <div class="sample-preview">
+          <strong data-i18n="sample1Head">۵ راه برای جذاب‌تر کردن صفحه اینستاگرام</strong>
+          <p data-i18n="sample1Text">محتوای خوب باید برای مخاطب ارزش ایجاد کند. نیاز مخاطب را بشناس، تصویر مناسب انتخاب کن و با متن جذاب ارتباط بساز.</p>
+        </div>
+        <button type="button" data-sample="1" data-i18n="sampleButton">ساخت محتوای مشابه</button>
+      </article>
 
-    document.getElementById("generator").scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
+      <article class="sample-card">
+        <div class="sample-icon">🛍️</div>
+        <h3 data-i18n="sample2Title">نمونه معرفی محصول</h3>
+        <div class="sample-preview">
+          <strong data-i18n="sample2Head">معرفی یک شمع دست‌ساز معطر</strong>
+          <p data-i18n="sample2Text">با نور گرم و رایحه دلنشین، فضایی آرام و زیبا بساز. انتخابی مناسب برای هدیه و لحظه‌های خاص.</p>
+        </div>
+        <button type="button" data-sample="2" data-i18n="sampleButton">ساخت محتوای مشابه</button>
+      </article>
 
-    topicInput.focus();
-  }
-</script>
+      <article class="sample-card">
+        <div class="sample-icon">🎬</div>
+        <h3 data-i18n="sample3Title">نمونه سناریوی ویدئو</h3>
+        <div class="sample-preview">
+          <strong data-i18n="sample3Head">شروع یک روز پرانرژی</strong>
+          <p data-i18n="sample3Text">صحنه اول: آماده‌کردن قهوه. صحنه دوم: نور صبح و فنجان روی میز. گوینده: روزت را با یک لحظه آرامش شروع کن!</p>
+        </div>
+        <button type="button" data-sample="3" data-i18n="sampleButton">ساخت محتوای مشابه</button>
+      </article>
+    </div>
+  </section>
 
-    <section class="container" id="generator">
+  <section class="container" id="generator">
+    <div class="section-heading">
+      <h2 data-i18n="generatorTitle">محتوای بعدی‌ات را بساز</h2>
+      <p data-i18n="generatorSubtitle">موضوع را وارد کن، نوع محتوا را انتخاب کن و شروع کن.</p>
+    </div>
+
+    <div class="generator">
+      <section class="panel">
+        <div class="panel-title">
+          <div class="panel-title-icon">✍️</div>
+          <div>
+            <h3 data-i18n="textPanelTitle">ساخت محتوای جدید</h3>
+            <p data-i18n="textPanelDesc">موضوع و قالب دلخواهت را مشخص کن.</p>
+          </div>
+        </div>
+
+        <form id="contentForm">
+          <div class="field">
+            <label for="topic" data-i18n="topicLabel">موضوع محتوا</label>
+            <textarea id="topic" maxlength="500" required
+              placeholder="مثلاً: پنج روش جذاب برای معرفی محصولات..."
+            ></textarea>
+
+            <div class="field-meta">
+              <span data-i18n="topicHelp">موضوع را واضح و کوتاه بنویس.</span>
+              <span id="charCount">۰ از ۵۰۰</span>
+            </div>
+
+            <div class="examples">
+              <button type="button" class="example-chip" data-example="coffee" data-i18n="example1">قهوه و دارچین</button>
+              <button type="button" class="example-chip" data-example="clothes" data-i18n="example2">فروشگاه لباس</button>
+              <button type="button" class="example-chip" data-example="skincare" data-i18n="example3">مراقبت از پوست</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="kind" data-i18n="kindLabel">نوع محتوا</label>
+            <select id="kind">
+              <option value="social" data-i18n="kindSocial">پست شبکه‌های اجتماعی</option>
+              <option value="video" data-i18n="kindVideo">سناریوی ویدئوی کوتاه</option>
+              <option value="product" data-i18n="kindProduct">معرفی و تبلیغ محصول</option>
+              <option value="ideas" data-i18n="kindIdeas">پنج ایده خلاقانه</option>
+            </select>
+          </div>
+
+          <button type="submit" class="primary-button generate-button" id="generateButton" data-i18n="generateText">
+            ✦ ساخت محتوا با هوش مصنوعی
+          </button>
+
+          <div class="notice error" id="errorNotice" role="alert"></div>
+        </form>
+      </section>
+
+      <section class="panel output-panel">
+        <div class="panel-title">
+          <div class="panel-title-icon">✨</div>
+          <div>
+            <h3 data-i18n="draftTitle">پیش‌نویس شما</h3>
+            <p data-i18n="draftDesc">محتوای تولیدشده در این قسمت نمایش داده می‌شود.</p>
+          </div>
+        </div>
+
+        <div class="output-content" id="output" aria-live="polite">
+          <div class="output-placeholder" id="placeholder">
+            <span>📝</span>
+            <strong data-i18n="emptyTitle">هنوز محتوایی ساخته نشده است</strong>
+            <small data-i18n="emptyDesc">موضوعت را وارد کن و دکمه ساخت محتوا را بزن.</small>
+          </div>
+        </div>
+
+        <div class="output-toolbar">
+          <button class="tool-button" id="copyButton" type="button" disabled data-i18n="copyText">📋 کپی متن</button>
+          <button class="tool-button" id="clearButton" type="button" data-i18n="clearText">پاک کردن</button>
+        </div>
+
+        <div class="notice success" id="successNotice" role="status" data-i18n="textSuccess">
+          محتوا با موفقیت تولید شد.
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="container image-studio" id="imageStudio">
+    <div class="image-panel">
+      <div style="font-size:30px">🎨</div>
+      <h2 data-i18n="imageTitle">استودیوی تولید تصویر با هوش مصنوعی</h2>
+      <p class="image-description" data-i18n="imageDescription">
+        برای تبلیغات، شبکه‌های اجتماعی، معرفی محصولات یا کاور ویدئو تصویر بساز.
+      </p>
+
+      <form id="imageForm">
+        <label for="imagePrompt" data-i18n="imagePromptLabel">توضیح تصویر</label>
+        <textarea id="imagePrompt" maxlength="1400" required
+          placeholder="مثلاً: تصویر حرفه‌ای از یک فنجان قهوه با دارچین، نور گرم صبحگاهی..."
+        ></textarea>
+
+        <label for="imageType" data-i18n="imageTypeLabel">نوع تصویر</label>
+        <select id="imageType">
+          <option value="post" data-i18n="imagePost">پست شبکه اجتماعی</option>
+          <option value="story" data-i18n="imageStory">استوری</option>
+          <option value="product" data-i18n="imageProduct">عکاسی تبلیغاتی محصول</option>
+          <option value="cover" data-i18n="imageCover">کاور ویدئو</option>
+        </select>
+
+        <button class="image-create" type="submit" id="imageButton" data-i18n="generateImage">
+          ✨ ساخت تصویر با هوش مصنوعی
+        </button>
+      </form>
+
+      <div class="image-error" id="imageError" role="alert"></div>
+
+      <div class="image-result" id="imageResult" hidden>
+        <h3 data-i18n="imageResultTitle">تصویر ساخته‌شده شما</h3>
+        <img id="generatedImage" alt="AI generated image">
+        <a id="downloadImage" class="image-download" href="#" download="contentpilot-image.jpg" data-i18n="downloadImage">
+          ⬇️ ذخیره تصویر
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing" id="pricing">
+    <div class="container">
       <div class="section-heading">
-        <h2>محتوای بعدی‌ات را بساز</h2>
-        <p>موضوع را وارد کن، نوع محتوا را انتخاب کن و شروع کن.</p>
+        <h2 data-i18n="pricingTitle">پلن مناسب خودت را انتخاب کن</h2>
+        <p data-i18n="pricingSubtitle">قیمت‌های پیشنهادی نسخه اولیه ContentPilot Studio</p>
       </div>
 
-      <div class="generator">
-        <section class="panel">
-          <div class="panel-title">
-            <div class="panel-title-icon">✍️</div>
-            <div>
-              <h3>ساخت محتوای جدید</h3>
-              <p>موضوع و قالب دلخواهت را مشخص کن.</p>
-            </div>
-          </div>
+      <div class="plans">
+        <article class="plan">
+          <span class="plan-badge" data-i18n="planFreeBadge">برای شروع</span>
+          <h3 data-i18n="planFree">پلن رایگان</h3>
+          <p class="plan-description" data-i18n="planFreeDesc">برای آشنایی با ابزار و امتحان‌کردن امکانات.</p>
+          <div class="price" id="freePrice">۰ ریال</div>
+          <ul>
+            <li data-i18n="freeFeature1">امکان آزمایش ابزار</li>
+            <li data-i18n="freeFeature2">مناسب برای شروع</li>
+            <li data-i18n="freeFeature3">بدون پرداخت اولیه</li>
+          </ul>
+          <a class="secondary-button plan-button" href="#generator" style="display:block;text-align:center" data-i18n="startFree">
+            شروع رایگان
+          </a>
+        </article>
 
-          <form id="contentForm">
-            <div class="field">
-              <label for="topic">موضوع محتوا</label>
-              <textarea
-                id="topic"
-                maxlength="500"
-                required
-                placeholder="مثلاً: پنج روش جذاب برای معرفی محصولات در اینستاگرام..."
-              ></textarea>
+        <article class="plan featured">
+          <span class="plan-badge" data-i18n="planPopular">پیشنهاد شروع</span>
+          <h3 data-i18n="planCredit">بستهٔ ۳۰ اعتبار</h3>
+          <p class="plan-description" data-i18n="planCreditDesc">برای تولید محتوای بیشتر و استفاده از ابزار.</p>
+          <div class="price" id="creditPrice">۴۵۰٬۰۰۰ ریال</div>
+          <ul>
+            <li data-i18n="creditFeature1">۳۰ اعتبار تولید محتوا</li>
+            <li data-i18n="creditFeature2">مناسب استفاده بیشتر</li>
+            <li data-i18n="creditFeature3">پرداخت آنلاین هنوز فعال نیست</li>
+          </ul>
+          <button class="secondary-button plan-button paymentButton" type="button" data-i18n="buyComingSoon">
+            خرید به‌زودی فعال می‌شود
+          </button>
+        </article>
 
-              <div class="field-meta">
-                <span>موضوع را واضح و کوتاه بنویس.</span>
-                <span id="charCount">۰ از ۵۰۰</span>
-              </div>
-
-              <div class="examples">
-                <button type="button" class="example-chip" data-topic="روش‌های خوش‌طعم کردن قهوه با دارچین">قهوه و دارچین</button>
-                <button type="button" class="example-chip" data-topic="ایده‌های تولید محتوا برای فروشگاه آنلاین لباس">فروشگاه لباس</button>
-                <button type="button" class="example-chip" data-topic="معرفی یک محصول مراقبت از پوست">محصول مراقبت پوست</button>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="kind">نوع محتوا</label>
-              <select id="kind">
-                <option value="social">پست شبکه‌های اجتماعی</option>
-                <option value="video">سناریوی ویدئوی کوتاه</option>
-                <option value="product">معرفی و تبلیغ محصول</option>
-                <option value="ideas">پنج ایده خلاقانه</option>
-              </select>
-            </div>
-
-            <button type="submit" class="primary-button generate-button" id="generateButton">
-              <span class="spinner" id="spinner"></span>
-              <span id="buttonText">✦ ساخت محتوا با هوش مصنوعی</span>
-            </button>
-
-            <div class="notice error" id="errorNotice" role="alert"></div>
-          </form>
-        </section>
-
-        <section class="panel output-panel">
-          <div class="panel-title">
-            <div class="panel-title-icon">✨</div>
-            <div>
-              <h3>پیش‌نویس شما</h3>
-              <p>محتوای تولیدشده در این قسمت نمایش داده می‌شود.</p>
-            </div>
-          </div>
-
-          <div
-            class="output-content"
-            id="output"
-            aria-live="polite"
-            aria-label="متن تولیدشده"
-          >
-            <div class="output-placeholder" id="placeholder">
-              <span>📝</span>
-              <strong>هنوز محتوایی ساخته نشده است</strong>
-              <small>موضوعت را وارد کن و دکمه ساخت محتوا را بزن.</small>
-            </div>
-          </div>
-
-          <div class="output-toolbar">
-            <button class="tool-button" id="copyButton" type="button" disabled>
-              📋 کپی متن
-            </button>
-            <button class="tool-button" id="clearButton" type="button">
-              پاک کردن
-            </button>
-          </div>
-
-          <div class="notice success" id="successNotice" role="status">
-            محتوای شما با موفقیت تولید شد.
-          </div>
-        </section>
+        <article class="plan">
+          <span class="plan-badge" data-i18n="planProBadge">برای حرفه‌ای‌ها</span>
+          <h3 data-i18n="planPro">اشتراک حرفه‌ای</h3>
+          <p class="plan-description" data-i18n="planProDesc">برای استفاده مداوم از امکانات تولید محتوا.</p>
+          <div class="price" id="proPrice">به‌زودی</div>
+          <ul>
+            <li data-i18n="proFeature1">امکانات بیشتر</li>
+            <li data-i18n="proFeature2">مناسب تولیدکنندگان محتوا</li>
+            <li data-i18n="proFeature3">پس از آماده‌سازی فعال می‌شود</li>
+          </ul>
+          <button class="secondary-button plan-button paymentButton" type="button" data-i18n="comingSoon">
+            به‌زودی
+          </button>
+        </article>
       </div>
-    </section>
 
-<style>
-  .image-studio {
-    margin: 25px auto 75px;
-  }
-
-  .image-panel {
-    padding: 28px;
-    border: 1px solid rgba(139,124,255,.3);
-    border-radius: 22px;
-    background: linear-gradient(145deg,#1b2740,#141c31);
-    box-shadow: 0 15px 45px rgba(0,0,0,.15);
-  }
-
-  .image-panel h2 {
-    margin: 0 0 8px;
-    font-size: 26px;
-  }
-
-  .image-description {
-    color: #a8b2ca;
-    font-size: 14px;
-    margin-bottom: 23px;
-  }
-
-  .image-panel label {
-    display: block;
-    margin: 16px 0 8px;
-    font-size: 14px;
-    font-weight: bold;
-  }
-
-  .image-panel textarea,
-  .image-panel select {
-    width: 100%;
-    padding: 13px;
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 12px;
-    background: #0f172a;
-    color: white;
-    font: inherit;
-  }
-
-  .image-panel textarea {
-    min-height: 105px;
-    resize: vertical;
-  }
-
-  .image-create {
-    width: 100%;
-    margin-top: 20px;
-    min-height: 49px;
-    border: 0;
-    border-radius: 12px;
-    background: linear-gradient(120deg,#8876ff,#6857e8);
-    color: white;
-    font-weight: bold;
-    font-size: 15px;
-    cursor: pointer;
-  }
-
-  .image-create:disabled {
-    opacity: .6;
-    cursor: wait;
-  }
-
-  .image-error {
-    display: none;
-    margin-top: 14px;
-    padding: 12px;
-    border-radius: 10px;
-    color: #ffc0c0;
-    background: rgba(255,83,83,.1);
-    font-size: 13px;
-  }
-
-  .image-result {
-    margin-top: 25px;
-    padding: 15px;
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 15px;
-    background: #0f172a;
-  }
-
-  .image-result img {
-    display: block;
-    width: 100%;
-    max-height: 600px;
-    object-fit: contain;
-    border-radius: 11px;
-    background: #080d1a;
-  }
-
-  .image-download {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 11px 20px;
-    border-radius: 10px;
-    background: #44d6bd;
-    color: #091522;
-    font-weight: bold;
-    text-decoration: none;
-  }
-
-  .image-result[hidden] {
-    display: none;
-  }
-
-  @media(max-width:600px) {
-    .image-panel {
-      padding: 19px;
-    }
-
-    .image-panel h2 {
-      font-size: 22px;
-    }
-  }
-</style>
-
-<section class="container image-studio" id="imageStudio">
-  <div class="image-panel">
-
-    <div style="font-size:32px">🎨</div>
-
-    <h2>استودیوی تولید تصویر با هوش مصنوعی</h2>
-
-    <p class="image-description">
-      ایده‌ات را توصیف کن و برای تبلیغات، شبکه‌های اجتماعی،
-      معرفی محصولات یا کاور ویدئو تصویر بساز.
-    </p>
-
-    <form id="imageForm">
-
-      <label for="imagePrompt">توضیح تصویر</label>
-
-      <textarea
-        id="imagePrompt"
-        maxlength="1400"
-        required
-        placeholder="مثلاً: عکسی حرفه‌ای از یک فنجان قهوه با دارچین روی میز چوبی، نور گرم صبحگاهی و پس‌زمینه‌ای زیبا..."
-      ></textarea>
-
-      <label for="imageType">نوع تصویر</label>
-
-      <select id="imageType">
-        <option value="post">تصویر پست اینستاگرام</option>
-        <option value="story">تصویر استوری</option>
-        <option value="product">عکاسی تبلیغاتی محصول</option>
-        <option value="cover">کاور ویدئو</option>
-      </select>
-
-      <button
-        class="image-create"
-        type="submit"
-        id="imageButton"
-      >
-        ✨ ساخت تصویر با هوش مصنوعی
-      </button>
-
-    </form>
-
-    <div class="image-error" id="imageError" role="alert"></div>
-
-    <div class="image-result" id="imageResult" hidden>
-      <h3>تصویر ساخته‌شده شما</h3>
-
-      <img
-        id="generatedImage"
-        alt="تصویر تولیدشده با هوش مصنوعی"
-      >
-
-      <a
-        id="downloadImage"
-        class="image-download"
-        href="#"
-        download="contentpilot-image.jpg"
-      >
-        ⬇️ ذخیره تصویر
-      </a>
+      <p class="payment-note" data-i18n="paymentNote">
+        قیمت‌ها پیشنهادی‌اند. پرداخت آنلاین و تحویل خودکار اعتبار هنوز فعال نشده است.
+      </p>
     </div>
+  </section>
+</main>
 
+<footer>
+  <div class="container" data-i18n="footerText">
+    ContentPilot Studio · دستیار هوشمند تولید محتوا · نسخه اولیه
   </div>
-</section>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 (function () {
-  const IMAGE_API_URL =
-    "https://contentpilot-ai.mohannahaddadi363.workers.dev/";
+  "use strict";
 
-  const form = document.getElementById("imageForm");
-  const promptInput = document.getElementById("imagePrompt");
-  const typeInput = document.getElementById("imageType");
-  const button = document.getElementById("imageButton");
-  const errorBox = document.getElementById("imageError");
-  const resultBox = document.getElementById("imageResult");
-  const image = document.getElementById("generatedImage");
-  const download = document.getElementById("downloadImage");
+  const API_URL = "https://contentpilot-ai.mohannahaddadi363.workers.dev/";
 
-  form.addEventListener("submit", async function (event) {
+  const translations = {
+    fa: {
+      pageTitle: "ContentPilot Studio | دستیار هوشمند تولید محتوا",
+      description: "ContentPilot Studio؛ ابزار هوشمند تولید متن و تصویر برای کسب‌وکارها و تولیدکنندگان محتوا.",
+      languageButton: "English",
+      navText: "ساخت محتوا",
+      navImage: "تولید تصویر",
+      navPricing: "تعرفه‌ها",
+      start: "شروع رایگان",
+      eyebrow: "دستیار هوشمند تولید محتوا",
+      heroLine1: "ایده‌هایت را به محتوای",
+      heroHighlight: "حرفه‌ای",
+      heroLine2: "تبدیل کن",
+      heroDescription: "با کمک هوش مصنوعی، سریع‌تر ایده‌پردازی کن و محتوای اختصاصی بساز.",
+      startCreating: "شروع تولید محتوا",
+      seeSamples: "دیدن نمونه‌ها",
+      feature1Title: "تولید محتوای سریع",
+      feature1Desc: "از ایده تا متن آماده",
+      feature2Title: "تولید تصویر هوشمند",
+      feature2Desc: "ساخت تصاویر تبلیغاتی",
+      feature3Title: "خروجی قابل استفاده",
+      feature3Desc: "کپی و ذخیره آسان",
+      samplesTitle: "نمونه‌هایی از قدرت ContentPilot",
+      samplesSubtitle: "قبل از خرید، نمونه خروجی‌ها را ببین و ابزار را امتحان کن.",
+      sample1Title: "نمونه پست شبکه اجتماعی",
+      sample1Head: "۵ راه برای جذاب‌تر کردن صفحه اینستاگرام",
+      sample1Text: "محتوای خوب باید برای مخاطب ارزش ایجاد کند. نیاز مخاطب را بشناس، تصویر مناسب انتخاب کن و با متن جذاب ارتباط بساز.",
+      sample2Title: "نمونه معرفی محصول",
+      sample2Head: "معرفی یک شمع دست‌ساز معطر",
+      sample2Text: "با نور گرم و رایحه دلنشین، فضایی آرام و زیبا بساز. انتخابی مناسب برای هدیه و لحظه‌های خاص.",
+      sample3Title: "نمونه سناریوی ویدئو",
+      sample3Head: "شروع یک روز پرانرژی",
+      sample3Text: "صحنه اول: آماده‌کردن قهوه. صحنه دوم: نور صبح و فنجان روی میز. گوینده: روزت را با یک لحظه آرامش شروع کن!",
+      sampleButton: "ساخت محتوای مشابه",
+      generatorTitle: "محتوای بعدی‌ات را بساز",
+      generatorSubtitle: "موضوع را وارد کن، نوع محتوا را انتخاب کن و شروع کن.",
+      textPanelTitle: "ساخت محتوای جدید",
+      textPanelDesc: "موضوع و قالب دلخواهت را مشخص کن.",
+      topicLabel: "موضوع محتوا",
+      topicPlaceholder: "مثلاً: پنج روش جذاب برای معرفی محصولات...",
+      topicHelp: "موضوع را واضح و کوتاه بنویس.",
+      kindLabel: "نوع محتوا",
+      kindSocial: "پست شبکه‌های اجتماعی",
+      kindVideo: "سناریوی ویدئوی کوتاه",
+      kindProduct: "معرفی و تبلیغ محصول",
+      kindIdeas: "پنج ایده خلاقانه",
+      example1: "قهوه و دارچین",
+      example2: "فروشگاه لباس",
+      example3: "مراقبت از پوست",
+      generateText: "✦ ساخت محتوا با هوش مصنوعی",
+      loadingText: "در حال تولید محتوا...",
+      draftTitle: "پیش‌نویس شما",
+      draftDesc: "محتوای تولیدشده در این قسمت نمایش داده می‌شود.",
+      emptyTitle: "هنوز محتوایی ساخته نشده است",
+      emptyDesc: "موضوعت را وارد کن و دکمه ساخت محتوا را بزن.",
+      copyText: "📋 کپی متن",
+      clearText: "پاک کردن",
+      textSuccess: "محتوا با موفقیت تولید شد.",
+      imageTitle: "استودیوی تولید تصویر با هوش مصنوعی",
+      imageDescription: "برای تبلیغات، شبکه‌های اجتماعی، معرفی محصولات یا کاور ویدئو تصویر بساز.",
+      imagePromptLabel: "توضیح تصویر",
+      imagePlaceholder: "مثلاً: تصویر حرفه‌ای از یک فنجان قهوه با دارچین، نور گرم صبحگاهی...",
+      imageTypeLabel: "نوع تصویر",
+      imagePost: "پست شبکه اجتماعی",
+      imageStory: "استوری",
+      imageProduct: "عکاسی تبلیغاتی محصول",
+      imageCover: "کاور ویدئو",
+      generateImage: "✨ ساخت تصویر با هوش مصنوعی",
+      imageLoading: "در حال ساخت تصویر...",
+      imageResultTitle: "تصویر ساخته‌شده شما",
+      downloadImage: "⬇️ ذخیره تصویر",
+      pricingTitle: "پلن مناسب خودت را انتخاب کن",
+      pricingSubtitle: "قیمت‌های پیشنهادی نسخه اولیه ContentPilot Studio",
+      planFreeBadge: "برای شروع",
+      planFree: "پلن رایگان",
+      planFreeDesc: "برای آشنایی با ابزار و امتحان‌کردن امکانات.",
+      freeFeature1: "امکان آزمایش ابزار",
+      freeFeature2: "مناسب برای شروع",
+      freeFeature3: "بدون پرداخت اولیه",
+      startFree: "شروع رایگان",
+      planPopular: "پیشنهاد شروع",
+      planCredit: "بستهٔ ۳۰ اعتبار",
+      planCreditDesc: "برای تولید محتوای بیشتر و استفاده از ابزار.",
+      creditFeature1: "۳۰ اعتبار تولید محتوا",
+      creditFeature2: "مناسب استفاده بیشتر",
+      creditFeature3: "پرداخت آنلاین هنوز فعال نیست",
+      buyComingSoon: "خرید به‌زودی فعال می‌شود",
+      planProBadge: "برای حرفه‌ای‌ها",
+      planPro: "اشتراک حرفه‌ای",
+      planProDesc: "برای استفاده مداوم از امکانات تولید محتوا.",
+      proFeature1: "امکانات بیشتر",
+      proFeature2: "مناسب تولیدکنندگان محتوا",
+      proFeature3: "پس از آماده‌سازی فعال می‌شود",
+      comingSoon: "به‌زودی",
+      paymentNote: "قیمت‌ها پیشنهادی‌اند. پرداخت آنلاین و تحویل خودکار اعتبار هنوز فعال نشده است.",
+      footerText: "ContentPilot Studio · دستیار هوشمند تولید محتوا · نسخه اولیه",
+      requiredTopic: "لطفاً موضوع محتوا را وارد کن.",
+      topicTooLong: "موضوع باید کمتر از ۵۰۰ نویسه باشد.",
+      responseError: "پاسخ سرور قابل خواندن نیست.",
+      noText: "متنی از هوش مصنوعی دریافت نشد.",
+      copySuccess: "متن با موفقیت کپی شد.",
+      copyFail: "کپی خودکار ممکن نشد؛ متن را انتخاب و کپی کن.",
+      cleared: "پیش‌نویس پاک شد.",
+      paymentInactive: "پرداخت آنلاین هنوز فعال نشده است.",
+      imageRequired: "لطفاً توضیح تصویر را وارد کن.",
+      imageTooLong: "توضیح تصویر بیش از حد طولانی است.",
+      imageInvalid: "تصویر معتبری دریافت نشد.",
+      imageFail: "ساخت تصویر با مشکل روبه‌رو شد.",
+      imageSuccess: "تصویر آماده شد."
+    },
+
+    en: {
+      pageTitle: "ContentPilot Studio | AI Content Creator",
+      description: "ContentPilot Studio - AI-powered content and image creation for creators and businesses.",
+      languageButton: "فارسی",
+      navText: "Content",
+      navImage: "Image Studio",
+      navPricing: "Pricing",
+      start: "Start free",
+      eyebrow: "Your AI content assistant",
+      heroLine1: "Turn your ideas into",
+      heroHighlight: "professional",
+      heroLine2: "content",
+      heroDescription: "Create original content and explore fresh ideas faster with AI.",
+      startCreating: "Start creating",
+      seeSamples: "View examples",
+      feature1Title: "Fast content creation",
+      feature1Desc: "From idea to ready-to-use copy",
+      feature2Title: "AI image generation",
+      feature2Desc: "Create promotional visuals",
+      feature3Title: "Easy exports",
+      feature3Desc: "Copy and save your work",
+      samplesTitle: "Explore ContentPilot examples",
+      samplesSubtitle: "See sample outputs and try the tools before purchasing.",
+      sample1Title: "Social media post",
+      sample1Head: "5 ways to make your Instagram page more engaging",
+      sample1Text: "Great content gives your audience real value. Understand their needs, choose relevant visuals and communicate with clear, engaging copy.",
+      sample2Title: "Product introduction",
+      sample2Head: "Introducing a handmade scented candle",
+      sample2Text: "Create a calm, welcoming atmosphere with warm light and a pleasant fragrance. A thoughtful choice for gifts and special moments.",
+      sample3Title: "Video script",
+      sample3Head: "Start your day with energy",
+      sample3Text: "Scene one: prepare your coffee. Scene two: morning light and a cup on the table. Voice-over: Start your day with a peaceful moment!",
+      sampleButton: "Create something similar",
+      generatorTitle: "Create your next piece of content",
+      generatorSubtitle: "Enter a topic, choose a format and start creating.",
+      textPanelTitle: "Create new content",
+      textPanelDesc: "Choose a topic and preferred format.",
+      topicLabel: "Content topic",
+      topicPlaceholder: "For example: 5 creative ways to introduce products...",
+      topicHelp: "Keep your topic clear and specific.",
+      kindLabel: "Content format",
+      kindSocial: "Social media post",
+      kindVideo: "Short video script",
+      kindProduct: "Product description",
+      kindIdeas: "Five creative ideas",
+      example1: "Coffee and cinnamon",
+      example2: "Online clothing store",
+      example3: "Skincare",
+      generateText: "✦ Generate content with AI",
+      loadingText: "Generating content...",
+      draftTitle: "Your draft",
+      draftDesc: "Your generated content will appear here.",
+      emptyTitle: "No content yet",
+      emptyDesc: "Enter a topic and click the generate button.",
+      copyText: "📋 Copy text",
+      clearText: "Clear",
+      textSuccess: "Your content was generated successfully.",
+      imageTitle: "AI Image Studio",
+      imageDescription: "Create visuals for ads, social media, product showcases and video covers.",
+      imagePromptLabel: "Describe your image",
+      imagePlaceholder: "For example: a professional photo of a coffee cup with cinnamon in warm morning light...",
+      imageTypeLabel: "Image format",
+      imagePost: "Social media post",
+      imageStory: "Story",
+      imageProduct: "Product photography",
+      imageCover: "Video cover",
+      generateImage: "✨ Generate image with AI",
+      imageLoading: "Generating your image...",
+      imageResultTitle: "Your generated image",
+      downloadImage: "⬇️ Download image",
+      pricingTitle: "Choose your plan",
+      pricingSubtitle: "Introductory ContentPilot Studio pricing",
+      planFreeBadge: "Get started",
+      planFree: "Free plan",
+      planFreeDesc: "Explore the tools and try the core features.",
+      freeFeature1: "Try the content tools",
+      freeFeature2: "Great for getting started",
+      freeFeature3: "No upfront payment",
+      startFree: "Start for free",
+      planPopular: "Introductory offer",
+      planCredit: "30-credit pack",
+      planCreditDesc: "For more content creation and regular use.",
+      creditFeature1: "30 content credits",
+      creditFeature2: "For more frequent use",
+      creditFeature3: "Online checkout is not active yet",
+      buyComingSoon: "Purchases coming soon",
+      planProBadge: "For professionals",
+      planPro: "Pro subscription",
+      planProDesc: "For regular access to more content features.",
+      proFeature1: "More features",
+      proFeature2: "For content creators",
+      proFeature3: "Available after launch",
+      comingSoon: "Coming soon",
+      paymentNote: "Prices are indicative. Online payments and automatic credit delivery are not active yet.",
+      footerText: "ContentPilot Studio · AI content assistant · Early version",
+      requiredTopic: "Please enter a content topic.",
+      topicTooLong: "Your topic must be under 500 characters.",
+      responseError: "The server response could not be read.",
+      noText: "The AI did not return any text.",
+      copySuccess: "Text copied successfully.",
+      copyFail: "Automatic copy failed. Please select and copy the text.",
+      cleared: "Draft cleared.",
+      paymentInactive: "Online checkout is not active yet.",
+      imageRequired: "Please describe the image.",
+      imageTooLong: "Your image description is too long.",
+      imageInvalid: "No valid image was received.",
+      imageFail: "Image generation failed.",
+      imageSuccess: "Your image is ready."
+    }
+  };
+
+  const $ = id => document.getElementById(id);
+
+  let currentLanguage = "fa";
+  let generatedContent = "";
+  let toastTimer;
+
+  try {
+    const savedLanguage = localStorage.getItem("contentpilot-language");
+    if (savedLanguage === "en" || savedLanguage === "fa") {
+      currentLanguage = savedLanguage;
+    }
+  } catch (_) {}
+
+  function t(key) {
+    return translations[currentLanguage][key] || key;
+  }
+
+  function setLanguage(language) {
+    currentLanguage = language === "en" ? "en" : "fa";
+
+    const isEnglish = currentLanguage === "en";
+    const dictionary = translations[currentLanguage];
+
+    document.documentElement.lang = currentLanguage;
+    document.documentElement.dir = isEnglish ? "ltr" : "rtl";
+    document.title = dictionary.pageTitle;
+
+    const description = document.querySelector('meta[name="description"]');
+    if (description) description.content = dictionary.description;
+
+    document.querySelectorAll("[data-i18n]").forEach(element => {
+      const key = element.dataset.i18n;
+      if (dictionary[key]) element.textContent = dictionary[key];
+    });
+
+    $("languageButton").textContent = dictionary.languageButton;
+    $("topic").placeholder = dictionary.topicPlaceholder;
+    $("imagePrompt").placeholder = dictionary.imagePlaceholder;
+
+    $("topic").dir = isEnglish ? "ltr" : "rtl";
+    $("imagePrompt").dir = isEnglish ? "ltr" : "rtl";
+    $("output").dir = isEnglish ? "ltr" : "rtl";
+
+    $("charCount").textContent =
+      $("topic").value.length + (isEnglish ? " / 500" : " از ۵۰۰");
+
+    $("freePrice").textContent = isEnglish ? "$0" : "۰ ریال";
+    $("creditPrice").textContent = isEnglish ? "$1.00" : "۴۵۰٬۰۰۰ ریال";
+    $("proPrice").textContent = isEnglish ? "Coming soon" : "به‌زودی";
+
+    try {
+      localStorage.setItem("contentpilot-language", currentLanguage);
+    } catch (_) {}
+
+    if (generatedContent) {
+      $("output").textContent = generatedContent;
+    } else {
+      showPlaceholder();
+    }
+  }
+
+  function showToast(message) {
+    $("toast").textContent = message;
+    $("toast").classList.add("show");
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+      $("toast").classList.remove("show");
+    }, 2600);
+  }
+
+  function showPlaceholder() {
+    $("output").innerHTML = `
+      <div class="output-placeholder">
+        <span>📝</span>
+        <strong>${t("emptyTitle")}</strong>
+        <small>${t("emptyDesc")}</small>
+      </div>
+    `;
+  }
+
+  function hideNotices() {
+    $("errorNotice").classList.remove("visible");
+    $("successNotice").classList.remove("visible");
+  }
+
+  function showTextError(message) {
+    $("errorNotice").textContent = message;
+    $("errorNotice").classList.add("visible");
+  }
+
+  function setTextLoading(loading) {
+    $("generateButton").disabled = loading;
+    $("generateButton").textContent =
+      loading ? t("loadingText") : t("generateText");
+  }
+
+  $("languageButton").addEventListener("click", () => {
+    setLanguage(currentLanguage === "fa" ? "en" : "fa");
+  });
+
+  const samples = {
+    1: {
+      fa: { topic: "پنج راه کاربردی برای جذاب‌تر کردن صفحه اینستاگرام", kind: "social" },
+      en: { topic: "5 practical ways to make an Instagram page more engaging", kind: "social" }
+    },
+    2: {
+      fa: { topic: "معرفی و تبلیغ یک شمع دست‌ساز معطر", kind: "product" },
+      en: { topic: "Promote a handmade scented candle", kind: "product" }
+    },
+    3: {
+      fa: { topic: "سناریوی ویدئوی کوتاه درباره شروع یک روز پرانرژی", kind: "video" },
+      en: { topic: "A short video script about starting an energetic day", kind: "video" }
+    }
+  };
+
+  document.querySelectorAll("[data-sample]").forEach(button => {
+    button.addEventListener("click", () => {
+      const sample = samples[button.dataset.sample][currentLanguage];
+      $("topic").value = sample.topic;
+      $("kind").value = sample.kind;
+      $("charCount").textContent =
+        sample.topic.length + (currentLanguage === "en" ? " / 500" : " از ۵۰۰");
+
+      $("generator").scrollIntoView({ behavior: "smooth" });
+      $("topic").focus();
+    });
+  });
+
+  const examples = {
+    coffee: {
+      fa: "روش‌های خوش‌طعم کردن قهوه با دارچین",
+      en: "Ways to make coffee taste better with cinnamon"
+    },
+    clothes: {
+      fa: "ایده‌های تولید محتوا برای فروشگاه آنلاین لباس",
+      en: "Content ideas for an online clothing store"
+    },
+    skincare: {
+      fa: "معرفی یک محصول مراقبت از پوست",
+      en: "Introducing a skincare product"
+    }
+  };
+
+  document.querySelectorAll("[data-example]").forEach(button => {
+    button.addEventListener("click", () => {
+      $("topic").value = examples[button.dataset.example][currentLanguage];
+      $("charCount").textContent =
+        $("topic").value.length + (currentLanguage === "en" ? " / 500" : " از ۵۰۰");
+      $("topic").focus();
+    });
+  });
+
+  $("topic").addEventListener("input", () => {
+    $("charCount").textContent =
+      $("topic").value.length + (currentLanguage === "en" ? " / 500" : " از ۵۰۰");
+  });
+
+  $("contentForm").addEventListener("submit", async event => {
     event.preventDefault();
+    hideNotices();
 
-    const prompt = promptInput.value.trim();
+    const topic = $("topic").value.trim();
+    const kind = $("kind").value;
 
-    errorBox.style.display = "none";
-    errorBox.textContent = "";
-
-    if (!prompt) {
-      errorBox.textContent = "لطفاً توضیح تصویر را وارد کن.";
-      errorBox.style.display = "block";
+    if (!topic) {
+      showTextError(t("requiredTopic"));
+      $("topic").focus();
       return;
     }
 
-    button.disabled = true;
-    button.textContent = "در حال ساخت تصویر... لطفاً صبر کن.";
+    if (topic.length > 500) {
+      showTextError(t("topicTooLong"));
+      return;
+    }
 
-    resultBox.hidden = true;
+    setTextLoading(true);
 
     try {
-      const response = await fetch(IMAGE_API_URL, {
+      const response = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic,
+          kind,
+          language: currentLanguage
+        })
+      });
+
+      let data;
+
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error(t("responseError"));
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || t("responseError"));
+      }
+
+      if (!data.text || !String(data.text).trim()) {
+        throw new Error(t("noText"));
+      }
+
+      generatedContent = String(data.text).trim();
+      $("output").textContent = generatedContent;
+      $("output").dir = currentLanguage === "en" ? "ltr" : "rtl";
+      $("copyButton").disabled = false;
+      $("successNotice").classList.add("visible");
+
+      $("output").scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+      });
+
+    } catch (error) {
+      console.error(error);
+      showTextError(error.message || t("responseError"));
+    } finally {
+      setTextLoading(false);
+    }
+  });
+
+  $("copyButton").addEventListener("click", async () => {
+    if (!generatedContent) return;
+
+    try {
+      await navigator.clipboard.writeText(generatedContent);
+      showToast(t("copySuccess"));
+    } catch (_) {
+      const temp = document.createElement("textarea");
+      temp.value = generatedContent;
+      document.body.appendChild(temp);
+      temp.select();
+
+      try {
+        document.execCommand("copy");
+        showToast(t("copySuccess"));
+      } catch (_) {
+        showToast(t("copyFail"));
+      }
+
+      temp.remove();
+    }
+  });
+
+  $("clearButton").addEventListener("click", () => {
+    generatedContent = "";
+    $("output").textContent = "";
+    showPlaceholder();
+    $("copyButton").disabled = true;
+    hideNotices();
+    showToast(t("cleared"));
+  });
+
+  document.querySelectorAll(".paymentButton").forEach(button => {
+    button.addEventListener("click", () => {
+      showToast(t("paymentInactive"));
+    });
+  });
+
+  // IMAGE GENERATION
+  $("imageForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const prompt = $("imagePrompt").value.trim();
+    const imageType = $("imageType").value;
+
+    $("imageError").style.display = "none";
+    $("imageError").textContent = "";
+
+    if (!prompt) {
+      $("imageError").textContent = t("imageRequired");
+      $("imageError").style.display = "block";
+      return;
+    }
+
+    if (prompt.length > 1400) {
+      $("imageError").textContent = t("imageTooLong");
+      $("imageError").style.display = "block";
+      return;
+    }
+
+    $("imageButton").disabled = true;
+    $("imageButton").textContent = t("imageLoading");
+    $("imageResult").hidden = true;
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "image",
-          prompt: prompt,
-          imageType: typeInput.value
+          prompt,
+          imageType
         })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.error || "ساخت تصویر با مشکل روبه‌رو شد."
-        );
+        throw new Error(data.error || t("imageFail"));
       }
 
       if (
         !data.imageData ||
         !data.imageData.startsWith("data:image/")
       ) {
-        throw new Error("تصویر معتبری دریافت نشد.");
+        throw new Error(t("imageInvalid"));
       }
 
-      image.src = data.imageData;
-      download.href = data.imageData;
-      resultBox.hidden = false;
+      $("generatedImage").src = data.imageData;
+      $("downloadImage").href = data.imageData;
+      $("imageResult").hidden = false;
 
-      resultBox.scrollIntoView({
+      showToast(t("imageSuccess"));
+
+      $("imageResult").scrollIntoView({
         behavior: "smooth",
         block: "nearest"
       });
 
     } catch (error) {
-      console.error("Image generation error:", error);
-
-      errorBox.textContent =
-        error.message || "اتصال به سرویس تولید تصویر برقرار نشد.";
-
-      errorBox.style.display = "block";
-
+      console.error(error);
+      $("imageError").textContent = error.message || t("imageFail");
+      $("imageError").style.display = "block";
     } finally {
-      button.disabled = false;
-      button.textContent = "✨ ساخت تصویر با هوش مصنوعی";
+      $("imageButton").disabled = false;
+      $("imageButton").textContent = t("generateImage");
     }
   });
+
+  setLanguage(currentLanguage);
 })();
 </script>
-
-    <section class="pricing" id="pricing">
-      <div class="container">
-        <div class="section-heading">
-          <h2>پلن مناسب خودت را انتخاب کن</h2>
-          <p>قیمت‌های پیشنهادی نسخه اولیه ContentPilot Studio</p>
-        </div>
-
-        <div class="plans">
-          <article class="plan">
-            <span class="plan-badge">برای شروع</span>
-            <h3>پلن رایگان</h3>
-            <p class="plan-description">برای آشنایی با ابزار و امتحان‌کردن امکانات.</p>
-            <div class="price">$0</div>
-            <ul>
-              <li>دسترسی به ابزار تولید محتوا</li>
-              <li>مناسب برای شروع</li>
-              <li>بدون پرداخت اولیه</li>
-            </ul>
-            <a class="secondary-button plan-button" href="#generator" style="display:block;text-align:center">
-              شروع رایگان
-            </a>
-          </article>
-
-          <article class="plan featured">
-            <span class="plan-badge">بسته پیشنهادی</span>
-            <h3>بسته اعتباری</h3>
-            <p class="plan-description">برای کسانی که به تولید محتوای بیشتر نیاز دارند.</p>
-            <div class="price">$3</div>
-            <ul>
-              <li>قیمت پیشنهادی برای ۳۰ اعتبار</li>
-              <li>مناسب تولید محتوای بیشتر</li>
-              <li>خرید آنلاین هنوز فعال نیست</li>
-            </ul>
-            <button class="secondary-button plan-button paymentButton" type="button">
-              به‌زودی فعال می‌شود
-            </button>
-          </article>
-
-          <article class="plan">
-            <span class="plan-badge">برای حرفه‌ای‌ها</span>
-            <h3>اشتراک حرفه‌ای</h3>
-            <p class="plan-description">برای استفاده مداوم از امکانات تولید محتوا.</p>
-            <div class="price">$9 <small>/ ماه</small></div>
-            <ul>
-              <li>قیمت پیشنهادی ماهانه</li>
-              <li>مناسب تولیدکنندگان محتوا</li>
-              <li>خرید آنلاین هنوز فعال نیست</li>
-            </ul>
-            <button class="secondary-button plan-button paymentButton" type="button">
-              به‌زودی فعال می‌شود
-            </button>
-          </article>
-        </div>
-
-        <p class="payment-note">
-          توجه: قیمت‌ها آزمایشی هستند و پرداخت و خرید آنلاین هنوز فعال نشده است.
-        </p>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      ContentPilot Studio · دستیار هوشمند تولید محتوا · نسخه اولیه
-    </div>
-  </footer>
-
-  <div class="toast" id="toast" role="status"></div>
-
-  <script>
-    const API_URL =
-      "https://contentpilot-ai.mohannahaddadi363.workers.dev/";
-
-    const form = document.getElementById("contentForm");
-    const topicInput = document.getElementById("topic");
-    const kindSelect = document.getElementById("kind");
-    const generateButton = document.getElementById("generateButton");
-    const buttonText = document.getElementById("buttonText");
-    const spinner = document.getElementById("spinner");
-    const output = document.getElementById("output");
-    const copyButton = document.getElementById("copyButton");
-    const clearButton = document.getElementById("clearButton");
-    const errorNotice = document.getElementById("errorNotice");
-    const successNotice = document.getElementById("successNotice");
-    const charCount = document.getElementById("charCount");
-    const toast = document.getElementById("toast");
-
-    let generatedContent = "";
-    let toastTimer;
-
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add("show");
-
-      clearTimeout(toastTimer);
-
-      toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2800);
-    }
-
-    function setLoading(isLoading) {
-      generateButton.disabled = isLoading;
-      generateButton.classList.toggle("loading", isLoading);
-      spinner.style.display = isLoading ? "inline-block" : "none";
-
-      buttonText.textContent = isLoading
-        ? "در حال تولید محتوا..."
-        : "✦ ساخت محتوا با هوش مصنوعی";
-    }
-
-    function hideNotices() {
-      errorNotice.classList.remove("visible");
-      successNotice.classList.remove("visible");
-    }
-
-    function showError(message) {
-      errorNotice.textContent = message;
-      errorNotice.classList.add("visible");
-    }
-
-    function showPlaceholder() {
-      output.innerHTML = `
-        <div class="output-placeholder" id="placeholder">
-          <span>📝</span>
-          <strong>هنوز محتوایی ساخته نشده است</strong>
-          <small>موضوعت را وارد کن و دکمه ساخت محتوا را بزن.</small>
-        </div>
-      `;
-    }
-
-    topicInput.addEventListener("input", () => {
-      charCount.textContent =
-        topicInput.value.length + " از ۵۰۰";
-    });
-
-    document.querySelectorAll(".example-chip").forEach(button => {
-      button.addEventListener("click", () => {
-        topicInput.value = button.dataset.topic;
-        charCount.textContent =
-          topicInput.value.length + " از ۵۰۰";
-        topicInput.focus();
-      });
-    });
-
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
-      hideNotices();
-
-      const topic = topicInput.value.trim();
-      const kind = kindSelect.value;
-
-      if (!topic) {
-        showError("لطفاً ابتدا موضوع محتوا را وارد کن.");
-        topicInput.focus();
-        return;
-      }
-
-      if (topic.length > 500) {
-        showError("موضوع باید کمتر از ۵۰۰ نویسه باشد.");
-        return;
-      }
-
-      setLoading(true);
-
-      try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            topic: topic,
-            kind: kind
-          })
-        });
-
-        let data;
-
-        try {
-          data = await response.json();
-        } catch {
-          throw new Error("پاسخ سرور قابل خواندن نیست.");
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            data.error || "در تولید محتوا مشکلی پیش آمده است."
-          );
-        }
-
-        if (!data.text || !String(data.text).trim()) {
-          throw new Error("متنی از هوش مصنوعی دریافت نشد.");
-        }
-
-        generatedContent = String(data.text).trim();
-
-        // Display text safely without interpreting HTML.
-        output.textContent = generatedContent;
-
-        copyButton.disabled = false;
-        successNotice.classList.add("visible");
-
-        output.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest"
-        });
-
-      } catch (error) {
-        console.error("Content generation error:", error);
-
-        showError(
-          error.message ||
-          "اتصال به هوش مصنوعی برقرار نشد. دوباره تلاش کن."
-        );
-
-      } finally {
-        setLoading(false);
-      }
-    });
-
-    copyButton.addEventListener("click", async () => {
-      if (!generatedContent) return;
-
-      try {
-        await navigator.clipboard.writeText(generatedContent);
-        showToast("متن با موفقیت کپی شد.");
-      } catch (error) {
-        const temporary = document.createElement("textarea");
-        temporary.value = generatedContent;
-        temporary.style.position = "fixed";
-        temporary.style.opacity = "0";
-
-        document.body.appendChild(temporary);
-        temporary.select();
-
-        try {
-          document.execCommand("copy");
-          showToast("متن کپی شد.");
-        } catch {
-          showToast("کپی خودکار ممکن نشد؛ متن را انتخاب و کپی کن.");
-        }
-
-        temporary.remove();
-      }
-    });
-
-    clearButton.addEventListener("click", () => {
-      generatedContent = "";
-      output.innerHTML = "";
-      showPlaceholder();
-
-      copyButton.disabled = true;
-      hideNotices();
-
-      showToast("پیش‌نویس پاک شد.");
-    });
-
-    document.querySelectorAll(".paymentButton").forEach(button => {
-      button.addEventListener("click", () => {
-        showToast("پرداخت آنلاین هنوز فعال نشده است.");
-      });
-    });
-  </script>
 </body>
 </html>
