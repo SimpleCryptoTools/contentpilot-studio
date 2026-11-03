@@ -124,14 +124,37 @@
 
     .eyebrow {
       display: inline-flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
       align-items: center;
+      justify-content: center;
       gap: 8px;
+      width: max-content;
+      max-width: 100%;
       padding: 7px 15px;
       border: 1px solid rgba(139,124,255,.3);
       border-radius: 30px;
       background: rgba(139,124,255,.10);
       color: #c5bcff;
       font-size: 13px;
+      white-space: nowrap;
+      writing-mode: horizontal-tb;
+      direction: ltr;
+      text-orientation: mixed;
+    }
+
+    .eyebrow > span:last-child {
+      display: inline-block;
+      white-space: nowrap;
+      writing-mode: horizontal-tb;
+    }
+
+    html[lang="fa"] .eyebrow > span:last-child {
+      direction: rtl;
+    }
+
+    html[lang="en"] .eyebrow > span:last-child {
+      direction: ltr;
     }
 
     .eyebrow span {
@@ -704,11 +727,11 @@
         <span data-i18n="heroLine2">تبدیل کن</span>
       </h1>
 
-      <p class="hero-description" id="heroDescription">
+      <p class="hero-description" id="heroDescription" data-i18n="heroDescription">
         با کمک هوش مصنوعی، سریع‌تر ایده‌پردازی کن و محتوای اختصاصی بساز.
       </p>
 
-    <p class="hero-description" id="heroDescription" data-i18n="heroDescription">
+      <div class="hero-actions">
         <a class="primary-button" href="#generator" data-i18n="startCreating">شروع تولید محتوا</a>
         <a class="secondary-button" href="#samples" data-i18n="seeSamples">دیدن نمونه‌ها</a>
       </div>
