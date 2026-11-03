@@ -979,6 +979,275 @@
       </div>
     </section>
 
+<style>
+  .image-studio {
+    margin: 25px auto 75px;
+  }
+
+  .image-panel {
+    padding: 28px;
+    border: 1px solid rgba(139,124,255,.3);
+    border-radius: 22px;
+    background: linear-gradient(145deg,#1b2740,#141c31);
+    box-shadow: 0 15px 45px rgba(0,0,0,.15);
+  }
+
+  .image-panel h2 {
+    margin: 0 0 8px;
+    font-size: 26px;
+  }
+
+  .image-description {
+    color: #a8b2ca;
+    font-size: 14px;
+    margin-bottom: 23px;
+  }
+
+  .image-panel label {
+    display: block;
+    margin: 16px 0 8px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .image-panel textarea,
+  .image-panel select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    background: #0f172a;
+    color: white;
+    font: inherit;
+  }
+
+  .image-panel textarea {
+    min-height: 105px;
+    resize: vertical;
+  }
+
+  .image-create {
+    width: 100%;
+    margin-top: 20px;
+    min-height: 49px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(120deg,#8876ff,#6857e8);
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .image-create:disabled {
+    opacity: .6;
+    cursor: wait;
+  }
+
+  .image-error {
+    display: none;
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 10px;
+    color: #ffc0c0;
+    background: rgba(255,83,83,.1);
+    font-size: 13px;
+  }
+
+  .image-result {
+    margin-top: 25px;
+    padding: 15px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 15px;
+    background: #0f172a;
+  }
+
+  .image-result img {
+    display: block;
+    width: 100%;
+    max-height: 600px;
+    object-fit: contain;
+    border-radius: 11px;
+    background: #080d1a;
+  }
+
+  .image-download {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 11px 20px;
+    border-radius: 10px;
+    background: #44d6bd;
+    color: #091522;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .image-result[hidden] {
+    display: none;
+  }
+
+  @media(max-width:600px) {
+    .image-panel {
+      padding: 19px;
+    }
+
+    .image-panel h2 {
+      font-size: 22px;
+    }
+  }
+</style>
+
+<section class="container image-studio" id="imageStudio">
+  <div class="image-panel">
+
+    <div style="font-size:32px">🎨</div>
+
+    <h2>استودیوی تولید تصویر با هوش مصنوعی</h2>
+
+    <p class="image-description">
+      ایده‌ات را توصیف کن و برای تبلیغات، شبکه‌های اجتماعی،
+      معرفی محصولات یا کاور ویدئو تصویر بساز.
+    </p>
+
+    <form id="imageForm">
+
+      <label for="imagePrompt">توضیح تصویر</label>
+
+      <textarea
+        id="imagePrompt"
+        maxlength="1400"
+        required
+        placeholder="مثلاً: عکسی حرفه‌ای از یک فنجان قهوه با دارچین روی میز چوبی، نور گرم صبحگاهی و پس‌زمینه‌ای زیبا..."
+      ></textarea>
+
+      <label for="imageType">نوع تصویر</label>
+
+      <select id="imageType">
+        <option value="post">تصویر پست اینستاگرام</option>
+        <option value="story">تصویر استوری</option>
+        <option value="product">عکاسی تبلیغاتی محصول</option>
+        <option value="cover">کاور ویدئو</option>
+      </select>
+
+      <button
+        class="image-create"
+        type="submit"
+        id="imageButton"
+      >
+        ✨ ساخت تصویر با هوش مصنوعی
+      </button>
+
+    </form>
+
+    <div class="image-error" id="imageError" role="alert"></div>
+
+    <div class="image-result" id="imageResult" hidden>
+      <h3>تصویر ساخته‌شده شما</h3>
+
+      <img
+        id="generatedImage"
+        alt="تصویر تولیدشده با هوش مصنوعی"
+      >
+
+      <a
+        id="downloadImage"
+        class="image-download"
+        href="#"
+        download="contentpilot-image.jpg"
+      >
+        ⬇️ ذخیره تصویر
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function () {
+  const IMAGE_API_URL =
+    "https://contentpilot-ai.mohannahaddadi363.workers.dev/";
+
+  const form = document.getElementById("imageForm");
+  const promptInput = document.getElementById("imagePrompt");
+  const typeInput = document.getElementById("imageType");
+  const button = document.getElementById("imageButton");
+  const errorBox = document.getElementById("imageError");
+  const resultBox = document.getElementById("imageResult");
+  const image = document.getElementById("generatedImage");
+  const download = document.getElementById("downloadImage");
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const prompt = promptInput.value.trim();
+
+    errorBox.style.display = "none";
+    errorBox.textContent = "";
+
+    if (!prompt) {
+      errorBox.textContent = "لطفاً توضیح تصویر را وارد کن.";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "در حال ساخت تصویر... لطفاً صبر کن.";
+
+    resultBox.hidden = true;
+
+    try {
+      const response = await fetch(IMAGE_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "image",
+          prompt: prompt,
+          imageType: typeInput.value
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "ساخت تصویر با مشکل روبه‌رو شد."
+        );
+      }
+
+      if (
+        !data.imageData ||
+        !data.imageData.startsWith("data:image/")
+      ) {
+        throw new Error("تصویر معتبری دریافت نشد.");
+      }
+
+      image.src = data.imageData;
+      download.href = data.imageData;
+      resultBox.hidden = false;
+
+      resultBox.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+      });
+
+    } catch (error) {
+      console.error("Image generation error:", error);
+
+      errorBox.textContent =
+        error.message || "اتصال به سرویس تولید تصویر برقرار نشد.";
+
+      errorBox.style.display = "block";
+
+    } finally {
+      button.disabled = false;
+      button.textContent = "✨ ساخت تصویر با هوش مصنوعی";
+    }
+  });
+})();
+</script>
+
     <section class="pricing" id="pricing">
       <div class="container">
         <div class="section-heading">
