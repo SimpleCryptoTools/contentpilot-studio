@@ -751,6 +751,139 @@
       </div>
     </section>
 
+<style>
+  .samples-section {
+    margin: 20px auto 75px;
+  }
+
+  .samples-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .sample-card {
+    padding: 23px;
+    border: 1px solid rgba(139,124,255,.25);
+    border-radius: 18px;
+    background: linear-gradient(145deg,#1b2740,#141c31);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sample-icon {
+    font-size: 30px;
+  }
+
+  .sample-card h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #c5bcff;
+  }
+
+  .sample-preview {
+    padding: 13px;
+    border-radius: 11px;
+    background: rgba(8,13,26,.5);
+    color: #dce3f5;
+    font-size: 12px;
+    line-height: 2;
+    flex: 1;
+  }
+
+  .sample-card button {
+    width: 100%;
+    border: 0;
+    border-radius: 11px;
+    padding: 11px;
+    background: linear-gradient(120deg,#8876ff,#6857e8);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .sample-card button:hover {
+    opacity: .9;
+  }
+
+  @media(max-width:800px) {
+    .samples-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<section class="container samples-section" id="samples">
+  <div class="section-heading">
+    <h2>نمونه‌هایی از قدرت ContentPilot ✨</h2>
+    <p>قبل از خرید، نمونه خروجی‌ها را ببین و ابزار را رایگان امتحان کن.</p>
+  </div>
+
+  <div class="samples-grid">
+
+    <article class="sample-card">
+      <div class="sample-icon">📱</div>
+      <h3>نمونه پست اینستاگرام</h3>
+      <div class="sample-preview">
+        <strong>۵ راه برای افزایش جذابیت صفحه اینستاگرام</strong>
+        <p>محتوای خوب فقط زیبا نیست؛ باید برای مخاطب ارزش ایجاد کند. با شناخت نیاز مخاطب، تصویر مناسب و متن جذاب، صفحه خودت را حرفه‌ای‌تر کن.</p>
+        <p>✨ از امروز با یک ایده تازه شروع کن!</p>
+      </div>
+      <button onclick="useContentSample('پنج راه کاربردی برای جذاب‌تر کردن صفحه اینستاگرام','social')">
+        ساخت محتوای مشابه
+      </button>
+    </article>
+
+    <article class="sample-card">
+      <div class="sample-icon">🛍️</div>
+      <h3>نمونه معرفی محصول</h3>
+      <div class="sample-preview">
+        <strong>معرفی شمع دست‌ساز معطر</strong>
+        <p>فضای خانه را با رایحه‌ای دلنشین و نور گرم شمع‌های دست‌ساز زیباتر کن. انتخابی جذاب برای هدیه دادن و ساختن لحظه‌های آرام.</p>
+        <p>🎁 زیبایی یک هدیه متفاوت را تجربه کن.</p>
+      </div>
+      <button onclick="useContentSample('معرفی و تبلیغ یک شمع دست‌ساز معطر','product')">
+        ساخت محتوای مشابه
+      </button>
+    </article>
+
+    <article class="sample-card">
+      <div class="sample-icon">🎬</div>
+      <h3>نمونه سناریوی ویدئو</h3>
+      <div class="sample-preview">
+        <strong>موضوع: شروع یک روز پرانرژی</strong>
+        <p>صحنه اول: نمای نزدیک از آماده‌کردن قهوه.</p>
+        <p>صحنه دوم: نور صبح و فنجان قهوه روی میز.</p>
+        <p>گوینده: روزت را با یک لحظه آرامش شروع کن!</p>
+      </div>
+      <button onclick="useContentSample('سناریوی ویدئوی کوتاه درباره شروع یک روز پرانرژی','video')">
+        ساخت محتوای مشابه
+      </button>
+    </article>
+
+  </div>
+</section>
+
+<script>
+  function useContentSample(topic, kind) {
+    const topicInput = document.getElementById("topic");
+    const kindSelect = document.getElementById("kind");
+
+    topicInput.value = topic;
+    kindSelect.value = kind;
+
+    topicInput.dispatchEvent(new Event("input"));
+
+    document.getElementById("generator").scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    topicInput.focus();
+  }
+</script>
+
     <section class="container" id="generator">
       <div class="section-heading">
         <h2>محتوای بعدی‌ات را بساز</h2>
