@@ -263,6 +263,49 @@
       font-size: 13px;
     }
 
+
+    .account-section { margin: 10px auto 65px; }
+    .account-panel {
+      padding: 24px;
+      border: 1px solid rgba(68,214,189,.22);
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(27,39,64,.96), rgba(20,28,49,.96));
+    }
+    .account-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      align-items: center;
+    }
+    .account-copy h2 { margin: 0 0 7px; font-size: 23px; }
+    .account-copy p { margin: 0; color: var(--muted); font-size: 13px; }
+    .account-form { display: grid; gap: 10px; }
+    .account-form input {
+      width: 100%; padding: 12px 13px; border: 1px solid var(--border);
+      border-radius: 11px; outline: none; background: #0f172a; color: white;
+    }
+    .account-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139,124,255,.12); }
+    .account-form-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+    .account-form-actions button { flex: 1; min-width: 130px; }
+    .account-toggle {
+      border: 1px solid var(--border); border-radius: 11px; padding: 10px 14px;
+      background: transparent; color: #c5bcff; font-size: 12px;
+    }
+    .account-message { display: none; margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-size: 12px; }
+    .account-message.visible { display: block; }
+    .account-message.error { color: #ffc0c0; background: rgba(255,83,83,.1); }
+    .account-message.success { color: #a5f2d8; background: rgba(68,214,189,.09); }
+    .account-summary { display: none; margin-top: 17px; padding: 15px; border-radius: 14px; background: rgba(8,13,26,.48); }
+    .account-summary.visible { display: block; }
+    .account-summary-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .account-email { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .wallet-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 13px; }
+    .wallet-stat { padding: 12px; border: 1px solid var(--border); border-radius: 11px; }
+    .wallet-stat small { display: block; color: var(--muted); font-size: 11px; }
+    .wallet-stat strong { display: block; margin-top: 3px; font-size: 21px; color: var(--secondary); }
+    .logout-button { border: 1px solid var(--border); border-radius: 10px; background: var(--surface2); color: white; padding: 8px 13px; font-size: 11px; }
+    @media(max-width:800px) { .account-layout { grid-template-columns: 1fr; } }
+
     .samples-section { margin-bottom: 75px; }
 
     .samples-grid {
@@ -764,6 +807,46 @@
     </div>
   </section>
 
+
+  <section class="container account-section" id="accountSection">
+    <div class="account-panel">
+      <div class="account-layout" id="accountAuthLayout">
+        <div class="account-copy">
+          <h2 data-i18n="accountTitle">حساب کاربری و کیف اعتبار</h2>
+          <p data-i18n="accountDescription">ثبت‌نام کن تا سه استفادهٔ رایگان روزانه و موجودی اعتبارت را مدیریت کنی.</p>
+        </div>
+        <form class="account-form" id="authForm">
+          <input id="authEmail" type="email" maxlength="254" autocomplete="email" required data-i18n-placeholder="emailPlaceholder" placeholder="ایمیل" aria-label="Email">
+          <input id="authPassword" type="password" minlength="10" maxlength="128" autocomplete="current-password" required data-i18n-placeholder="passwordPlaceholder" placeholder="رمز عبور (حداقل ۱۰ نویسه)" aria-label="Password">
+          <div class="account-form-actions">
+            <button class="primary-button" type="submit" id="authSubmit" data-i18n="registerButton">ایجاد حساب</button>
+            <button class="account-toggle" type="button" id="authToggle" data-i18n="switchToLogin">قبلاً حساب داری؟ ورود</button>
+          </div>
+        </form>
+      </div>
+      <div class="account-summary" id="accountSummary" aria-live="polite">
+        <div class="account-summary-top">
+          <div>
+            <strong data-i18n="accountConnected">حساب شما متصل است</strong>
+            <div class="account-email" id="accountEmail"></div>
+          </div>
+          <button type="button" class="logout-button" id="logoutButton" data-i18n="logoutButton">خروج</button>
+        </div>
+        <div class="wallet-stats">
+          <div class="wallet-stat">
+            <small data-i18n="walletCredits">اعتبار خریداری‌شده</small>
+            <strong id="walletCredits">۰</strong>
+          </div>
+          <div class="wallet-stat">
+            <small data-i18n="walletFree">استفاده رایگان باقی‌مانده امروز</small>
+            <strong id="walletFree">۳</strong>
+          </div>
+        </div>
+      </div>
+      <div class="account-message" id="accountMessage" role="status"></div>
+    </div>
+  </section>
+
   <section class="container samples-section" id="samples">
     <div class="section-heading">
       <h2 data-i18n="samplesTitle">نمونه‌هایی از قدرت ContentPilot</h2>
@@ -1107,7 +1190,26 @@
       imageTooLong: "توضیح تصویر بیش از حد طولانی است.",
       imageInvalid: "تصویر معتبری دریافت نشد.",
       imageFail: "ساخت تصویر با مشکل روبه‌رو شد.",
-      imageSuccess: "تصویر آماده شد."
+      imageSuccess: "تصویر آماده شد.",
+      accountTitle: "حساب کاربری و کیف اعتبار",
+      accountDescription: "ثبت‌نام کن تا سه استفادهٔ رایگان روزانه و موجودی اعتبارت را مدیریت کنی.",
+      emailPlaceholder: "ایمیل",
+      passwordPlaceholder: "رمز عبور (حداقل ۱۰ نویسه)",
+      registerButton: "ایجاد حساب",
+      loginButton: "ورود به حساب",
+      switchToLogin: "قبلاً حساب داری؟ ورود",
+      switchToRegister: "حساب نداری؟ ثبت‌نام",
+      accountConnected: "حساب شما متصل است",
+      walletCredits: "اعتبار خریداری‌شده",
+      walletFree: "استفاده رایگان باقی‌مانده امروز",
+      logoutButton: "خروج",
+      authRequired: "برای استفاده از ابزار، ابتدا ثبت‌نام یا وارد حساب خود شو.",
+      authSuccess: "حساب با موفقیت آماده شد.",
+      loginSuccess: "با موفقیت وارد شدی.",
+      logoutSuccess: "از حساب خارج شدی.",
+      authError: "ورود یا ثبت‌نام انجام نشد. اطلاعات را بررسی کن.",
+      passwordHint: "رمز عبور باید حداقل ۱۰ نویسه باشد.",
+      accountLoadError: "اطلاعات حساب دریافت نشد. دوباره وارد شو."
     },
 
     en: {
@@ -1217,7 +1319,26 @@
       imageTooLong: "Your image description is too long.",
       imageInvalid: "No valid image was received.",
       imageFail: "Image generation failed.",
-      imageSuccess: "Your image is ready."
+      imageSuccess: "Your image is ready.",
+      accountTitle: "Account and credit wallet",
+      accountDescription: "Create an account to manage your three free daily generations and credits.",
+      emailPlaceholder: "Email address",
+      passwordPlaceholder: "Password (at least 10 characters)",
+      registerButton: "Create account",
+      loginButton: "Sign in",
+      switchToLogin: "Already have an account? Sign in",
+      switchToRegister: "New here? Create an account",
+      accountConnected: "Your account is connected",
+      walletCredits: "Purchased credits",
+      walletFree: "Free uses remaining today",
+      logoutButton: "Sign out",
+      authRequired: "Please create an account or sign in before using the tools.",
+      authSuccess: "Your account is ready.",
+      loginSuccess: "You are signed in.",
+      logoutSuccess: "You have signed out.",
+      authError: "Sign-in or registration failed. Check your details.",
+      passwordHint: "Password must be at least 10 characters.",
+      accountLoadError: "Could not load your account. Please sign in again."
     }
   };
 
@@ -1226,6 +1347,10 @@
   let currentLanguage = "fa";
   let generatedContent = "";
   let toastTimer;
+  let authMode = "register";
+  const SESSION_KEY = "contentpilot-access-token";
+  let accessToken = null;
+  try { accessToken = sessionStorage.getItem(SESSION_KEY); } catch (_) {}
 
   try {
     const savedLanguage = localStorage.getItem("contentpilot-language");
@@ -1259,6 +1384,9 @@
     $("languageButton").textContent = dictionary.languageButton;
     $("topic").placeholder = dictionary.topicPlaceholder;
     $("imagePrompt").placeholder = dictionary.imagePlaceholder;
+    $("authEmail").placeholder = dictionary.emailPlaceholder;
+    $("authPassword").placeholder = dictionary.passwordPlaceholder;
+    renderAuthMode();
 
     $("topic").dir = isEnglish ? "ltr" : "rtl";
     $("imagePrompt").dir = isEnglish ? "ltr" : "rtl";
@@ -1317,6 +1445,117 @@
     $("generateButton").textContent =
       loading ? t("loadingText") : t("generateText");
   }
+
+  function authHeaders() {
+    const headers = { "Content-Type": "application/json" };
+    if (accessToken) headers.Authorization = "Bearer " + accessToken;
+    return headers;
+  }
+
+  async function authRequest(payload) {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || t("authError"));
+    return data;
+  }
+
+  function setAuthMessage(message, isError = false) {
+    const box = $("accountMessage");
+    box.textContent = message;
+    box.className = "account-message visible " + (isError ? "error" : "success");
+  }
+
+  function renderAuthMode() {
+    if (!$("authSubmit")) return;
+    $("authSubmit").textContent = authMode === "register" ? t("registerButton") : t("loginButton");
+    $("authToggle").textContent = authMode === "register" ? t("switchToLogin") : t("switchToRegister");
+    $("authPassword").autocomplete = authMode === "register" ? "new-password" : "current-password";
+  }
+
+  function renderAccount(data) {
+    $("accountAuthLayout").style.display = "none";
+    $("accountSummary").classList.add("visible");
+    $("accountEmail").textContent = data.user?.email || "";
+    $("walletCredits").textContent = String(data.credits ?? 0);
+    $("walletFree").textContent = String(data.freeRemaining ?? 0);
+  }
+
+  function clearAccount() {
+    accessToken = null;
+    try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
+    $("accountAuthLayout").style.display = "grid";
+    $("accountSummary").classList.remove("visible");
+    $("accountEmail").textContent = "";
+    $("walletCredits").textContent = "0";
+    $("walletFree").textContent = "3";
+  }
+
+  async function refreshAccount() {
+    if (!accessToken) {
+      clearAccount();
+      return;
+    }
+    try {
+      const data = await authRequest({ action: "me" });
+      renderAccount(data);
+    } catch (error) {
+      clearAccount();
+      setAuthMessage(t("accountLoadError"), true);
+    }
+  }
+
+  $("authToggle").addEventListener("click", () => {
+    authMode = authMode === "register" ? "login" : "register";
+    renderAuthMode();
+    $("accountMessage").className = "account-message";
+  });
+
+  $("authForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const email = $("authEmail").value.trim();
+    const password = $("authPassword").value;
+
+    if (password.length < 10 || password.length > 128) {
+      setAuthMessage(t("passwordHint"), true);
+      return;
+    }
+
+    const submit = $("authSubmit");
+    submit.disabled = true;
+    try {
+      const data = await authRequest({
+        action: authMode,
+        email,
+        password
+      });
+
+      if (!data.accessToken) throw new Error(t("authError"));
+      accessToken = data.accessToken;
+      try { sessionStorage.setItem(SESSION_KEY, accessToken); } catch (_) {}
+      renderAccount(data);
+      setAuthMessage(authMode === "register" ? t("authSuccess") : t("loginSuccess"));
+      $("authPassword").value = "";
+    } catch (error) {
+      setAuthMessage(error.message || t("authError"), true);
+    } finally {
+      submit.disabled = false;
+      renderAuthMode();
+    }
+  });
+
+  $("logoutButton").addEventListener("click", async () => {
+    try {
+      await authRequest({ action: "logout" });
+    } catch (error) {
+      console.warn("Logout request failed", error);
+    }
+    clearAccount();
+    setAuthMessage(t("logoutSuccess"));
+  });
 
   $("languageButton").addEventListener("click", () => {
     setLanguage(currentLanguage === "fa" ? "en" : "fa");
@@ -1386,6 +1625,12 @@
     const topic = $("topic").value.trim();
     const kind = $("kind").value;
 
+    if (!accessToken) {
+      setAuthMessage(t("authRequired"), true);
+      $("accountSection").scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
     if (!topic) {
       showTextError(t("requiredTopic"));
       $("topic").focus();
@@ -1402,7 +1647,7 @@
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({
           topic,
           kind,
@@ -1427,6 +1672,7 @@
       }
 
       generatedContent = String(data.text).trim();
+      if (data.usage) renderAccount({ user: { email: $("accountEmail").textContent }, ...data.usage });
       $("output").textContent = generatedContent;
       $("output").dir = currentLanguage === "en" ? "ltr" : "rtl";
       $("copyButton").disabled = false;
@@ -1490,6 +1736,12 @@
     const prompt = $("imagePrompt").value.trim();
     const imageType = $("imageType").value;
 
+    if (!accessToken) {
+      setAuthMessage(t("authRequired"), true);
+      $("accountSection").scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
     $("imageError").style.display = "none";
     $("imageError").textContent = "";
 
@@ -1512,7 +1764,7 @@
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({
           action: "image",
           prompt,
@@ -1535,6 +1787,7 @@
 
       $("generatedImage").src = data.imageData;
       $("downloadImage").href = data.imageData;
+      if (data.usage) renderAccount({ user: { email: $("accountEmail").textContent }, ...data.usage });
       $("imageResult").hidden = false;
 
       showToast(t("imageSuccess"));
@@ -1555,6 +1808,8 @@
   });
 
   setLanguage(currentLanguage);
+  renderAuthMode();
+  refreshAccount();
 })();
 </script>
 </body>
