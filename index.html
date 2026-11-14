@@ -1365,6 +1365,7 @@
   let currentLanguage = "fa";
   let generatedContent = "";
   let toastTimer;
+  let generatedImageObjectUrl = null;
   let authMode = "register";
   const SESSION_KEY = "contentpilot-access-token";
   let accessToken = null;
@@ -1807,8 +1808,33 @@
         throw new Error(t("imageInvalid"));
       }
 
-      $("generatedImage").src = data.imageData;
-      $("downloadImage").href = data.imageData;
+      const imageResponse = await fetch(data.imageData);
+      const imageBlob = await imageResponse.blob();
+
+      if (!imageBlob.type.startsWith("image/") || imageBlob.size === 0) {
+        throw new Error(t("imageInvalid"));
+      }
+
+      const nextImageUrl = URL.createObjectURL(imageBlob);
+      const imageElement = $("generatedImage");
+      const previousImageUrl = generatedImageObjectUrl;
+
+      imageElement.src = nextImageUrl;
+      try {
+        await imageElement.decode();
+      } catch (_) {
+        if (previousImageUrl) imageElement.src = previousImageUrl;
+        else imageElement.removeAttribute("src");
+        URL.revokeObjectURL(nextImageUrl);
+        throw new Error(t("imageInvalid"));
+      }
+
+      if (previousImageUrl) URL.revokeObjectURL(previousImageUrl);
+      generatedImageObjectUrl = nextImageUrl;
+      $("downloadImage").href = nextImageUrl;
+      $("downloadImage").download =
+        `contentpilot-image.${imageBlob.type === "image/png" ? "png" : "jpg"}`;
+
       if (data.usage) renderAccount({ user: { email: $("accountEmail").textContent }, ...data.usage });
       $("imageResult").hidden = false;
 
