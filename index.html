@@ -929,9 +929,10 @@
         <form id="contentForm">
           <div class="field">
             <label for="topic" data-i18n="topicLabel">موضوع محتوا</label>
-            <textarea id="topic" maxlength="500" required
+            <textarea id="topic" maxlength="500" required aria-describedby="textPrivacyHint"
               placeholder="مثلاً: پنج روش جذاب برای معرفی محصولات..."
             ></textarea>
+            <p class="privacy-note" id="textPrivacyHint" data-i18n="privacyHint">موضوع و توضیح تصویر برای تولید به سرویس هوش مصنوعی ارسال می‌شود؛ اطلاعات محرمانه یا اطلاعات شخصی دیگران را وارد نکن.</p>
 
             <div class="field-meta">
               <span data-i18n="topicHelp">موضوع را واضح و کوتاه بنویس.</span>
@@ -1002,10 +1003,10 @@
 
       <form id="imageForm">
         <label for="imagePrompt" data-i18n="imagePromptLabel">توضیح تصویر</label>
-        <textarea id="imagePrompt" maxlength="1400" required
+        <textarea id="imagePrompt" maxlength="1400" required aria-describedby="imagePrivacyHint"
           placeholder="مثلاً: تصویر حرفه‌ای از یک فنجان قهوه با دارچین، نور گرم صبحگاهی..."
         ></textarea>
-        <p class="privacy-note" data-i18n="privacyHint">برای حفظ حریم خصوصی، رمز عبور، اطلاعات بانکی یا اطلاعات شخصی دیگران را در توضیح تصویر وارد نکن.</p>
+        <p class="privacy-note" id="imagePrivacyHint" data-i18n="privacyHint">موضوع و توضیح تصویر برای تولید به سرویس هوش مصنوعی ارسال می‌شود؛ اطلاعات محرمانه یا اطلاعات شخصی دیگران را وارد نکن.</p>
 
         <label for="imageType" data-i18n="imageTypeLabel">نوع تصویر</label>
         <select id="imageType">
@@ -1168,7 +1169,7 @@
       imageTitle: "استودیوی تولید تصویر با هوش مصنوعی",
       imageDescription: "برای تبلیغات، شبکه‌های اجتماعی، معرفی محصولات یا کاور ویدئو تصویر بساز.",
       imagePromptLabel: "توضیح تصویر",
-      privacyHint: "برای حفظ حریم خصوصی، رمز عبور، اطلاعات بانکی یا اطلاعات شخصی دیگران را در توضیح تصویر وارد نکن.",
+      privacyHint: "موضوع و توضیح تصویر برای تولید به سرویس هوش مصنوعی ارسال می‌شود؛ اطلاعات محرمانه یا اطلاعات شخصی دیگران را وارد نکن.",
       imagePlaceholder: "مثلاً: تصویر حرفه‌ای از یک فنجان قهوه با دارچین، نور گرم صبحگاهی...",
       imageTypeLabel: "نوع تصویر",
       imagePost: "پست شبکه اجتماعی",
@@ -1298,7 +1299,7 @@
       imageTitle: "AI Image Studio",
       imageDescription: "Create visuals for ads, social media, product showcases and video covers.",
       imagePromptLabel: "Describe your image",
-      privacyHint: "For privacy, do not include passwords, banking details, or another person’s personal information in your prompt.",
+      privacyHint: "Your topic and image prompt are sent to the AI service to generate results. Do not enter confidential details or another person’s personal information.",
       imagePlaceholder: "For example: a professional photo of a coffee cup with cinnamon in warm morning light...",
       imageTypeLabel: "Image format",
       imagePost: "Social media post",
