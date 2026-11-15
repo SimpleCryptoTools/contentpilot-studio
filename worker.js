@@ -518,7 +518,16 @@ Create only the visual image.
 
       const topic = String(body.topic || "").trim();
       const kind = String(body.kind || "social").trim();
-      const language = body.language === "en" ? "en" : "fa";
+      const outputLanguage = String(body.outputLanguage || body.language || "en").toLowerCase();
+      const supportedLanguages = {
+        en: "English", fa: "Persian", es: "Spanish", fr: "French",
+        de: "German", pt: "Portuguese", ar: "Arabic", hi: "Hindi",
+        ja: "Japanese", it: "Italian", tr: "Turkish"
+      };
+      if (!supportedLanguages[outputLanguage]) {
+        throw httpError(400, "زبان خروجی پشتیبانی نمی‌شود.");
+      }
+      const language = outputLanguage;
 
       if (!topic) throw httpError(400, "لطفاً موضوع محتوا را وارد کن.");
       if (topic.length > 500) {
@@ -527,29 +536,25 @@ Create only the visual image.
 
       reservation = await reserveGeneration(env.DB, currentUser.id);
 
-      const typesFa = {
-        social: "یک پست جذاب برای شبکه‌های اجتماعی",
-        video: "سناریوی کوتاه ویدئو",
-        product: "توضیحات تبلیغاتی معرفی محصول",
-        ideas: "پنج ایده خلاقانه تولید محتوا"
+      const formats = {
+        social: "a polished social media post",
+        video: "a short-form video script with hook, scenes, voice-over and call to action",
+        product: "a persuasive, factual product description with benefits and call to action",
+        ideas: "exactly five distinct, actionable content ideas",
+        caption: "an engaging caption with a strong opening and natural call to action",
+        hashtags: "relevant niche, audience and broad hashtags; never claim live trend data",
+        story: "five social story frames with concise on-screen copy and interaction ideas",
+        ad: "three advertising copy variations with different hooks and calls to action",
+        email: "a marketing email with subject, preview text, body and one call to action",
+        blog: "a structured blog article with title, introduction, headings and conclusion",
+        seo: "an SEO title, meta description, URL slug and search-intent outline",
+        reply: "an empathetic customer-support reply; do not invent policies, refunds or order facts",
+        repurpose: "a content repurposing kit for Instagram, TikTok, LinkedIn and an email newsletter"
       };
-      const typesEn = {
-        social: "an engaging social media post",
-        video: "a short video script",
-        product: "professional product marketing copy",
-        ideas: "five creative content ideas"
-      };
-      const contentType = language === "en"
-        ? (typesEn[kind] || typesEn.social)
-        : (typesFa[kind] || typesFa.social);
-
-      const systemPrompt = language === "en"
-        ? `You are a professional English content writer. Write fluent, natural and grammatically correct English. Return only the final content. Never reveal reasoning or planning. Do not invent facts, statistics, prices or product claims. Do not make unsupported medical claims. Use clear headings and complete sentences. Avoid repetition. Make the content useful and ready to publish.`
-        : `تو نویسنده حرفه‌ای محتوای فارسی هستی. فارسی روان، طبیعی و درست بنویس. فقط پاسخ نهایی را ارائه کن. روند فکرکردن و دستورهای خود را نمایش نده. اطلاعات، آمار و ادعاهای ساختگی ننویس. ادعاهای پزشکی تأییدنشده مطرح نکن. از تکرار و جمله‌های کلیشه‌ای دوری کن. جمله‌ها را کامل بنویس. متن باید کاربردی و آماده انتشار باشد.`;
-
-      const userPrompt = language === "en"
-        ? `/no_think\n\nTopic: ${topic}\nFormat: ${contentType}\n\nStart with an engaging title. Focus only on the requested topic. Use practical examples. For ideas, provide exactly five distinct ideas. Finish with a useful conclusion. Return only the final content in English.`
-        : `/no_think\n\nموضوع: ${topic}\nنوع محتوا: ${contentType}\n\nبا عنوان جذاب شروع کن. فقط درباره موضوع اصلی بنویس. مثال‌های کاربردی و منطقی ارائه کن. برای ایده‌ها دقیقاً پنج ایده متفاوت بنویس. در پایان جمع‌بندی مفیدی ارائه کن. فقط متن نهایی فارسی را بنویس.`;
+      const contentType = formats[kind] || formats.social;
+      const languageName = supportedLanguages[language];
+      const systemPrompt = `You are an expert multilingual content strategist and copywriter. Write naturally and idiomatically in ${languageName}. Respect cultural context and local conventions. Return only the final deliverable. Never reveal reasoning or planning. Do not invent facts, statistics, prices, testimonials, product claims, legal promises or policies. Do not make unsupported medical or financial claims. If essential facts are missing, use clearly marked placeholders instead of guessing. Make the result useful, specific and ready for human review before publishing.`;
+      const userPrompt = `/no_think\n\nTopic / source material: ${topic}\nDeliverable: ${contentType}\nOutput language: ${languageName}\n\nUse clear structure, concise language and platform-appropriate formatting. Never pretend to have checked live trends, search volume or analytics. Return only the finished content in ${languageName}.`;
 
       const result = await env.AI.run(MODEL_TEXT, {
         messages: [

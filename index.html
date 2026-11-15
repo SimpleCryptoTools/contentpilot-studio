@@ -967,7 +967,28 @@
               <option value="video" data-i18n="kindVideo">سناریوی ویدئوی کوتاه</option>
               <option value="product" data-i18n="kindProduct">معرفی و تبلیغ محصول</option>
               <option value="ideas" data-i18n="kindIdeas">پنج ایده خلاقانه</option>
+              <option value="caption" data-i18n="kindCaption">کپشن و دعوت به اقدام</option>
+              <option value="hashtags" data-i18n="kindHashtags">هشتگ‌های مرتبط</option>
+              <option value="story" data-i18n="kindStory">مجموعه استوری</option>
+              <option value="ad" data-i18n="kindAd">متن تبلیغاتی</option>
+              <option value="email" data-i18n="kindEmail">ایمیل بازاریابی</option>
+              <option value="blog" data-i18n="kindBlog">مقاله وبلاگ</option>
+              <option value="seo" data-i18n="kindSeo">عنوان و توضیحات SEO</option>
+              <option value="reply" data-i18n="kindReply">پاسخ به مشتری</option>
+              <option value="repurpose" data-i18n="kindRepurpose">بازآفرینی محتوا برای چند کانال</option>
             </select>
+          </div>
+          <div class="field">
+            <label for="outputLanguage" data-i18n="outputLanguageLabel">زبان خروجی</label>
+            <select id="outputLanguage">
+              <option value="en">English</option><option value="fa">فارسی</option>
+              <option value="es">Español</option><option value="fr">Français</option>
+              <option value="de">Deutsch</option><option value="pt">Português</option>
+              <option value="ar">العربية</option><option value="hi">हिन्दी</option>
+              <option value="ja">日本語</option><option value="it">Italiano</option>
+              <option value="tr">Türkçe</option>
+            </select>
+          </div>
           </div>
 
           <button type="submit" class="primary-button generate-button" id="generateButton" data-i18n="generateText">
@@ -997,6 +1018,7 @@
 
         <div class="output-toolbar">
           <button class="tool-button" id="copyButton" type="button" disabled data-i18n="copyText">📋 کپی متن</button>
+          <button class="tool-button" id="saveDraftButton" type="button" disabled data-i18n="saveDraft">ذخیره پیش‌نویس</button>
           <button class="tool-button" id="clearButton" type="button" data-i18n="clearText">پاک کردن</button>
         </div>
 
@@ -1005,6 +1027,13 @@
         </div>
       </section>
     </div>
+    <section class="panel" id="savedDraftsPanel" aria-labelledby="savedDraftsTitle" style="margin-top:18px">
+      <div class="panel-title"><div class="panel-title-icon">🗂️</div><div>
+        <h3 id="savedDraftsTitle" data-i18n="savedDraftsTitle">پیش‌نویس‌های ذخیره‌شده</h3>
+        <p data-i18n="savedDraftsDesc">پیش‌نویس‌ها فقط در همین مرورگر ذخیره می‌شوند.</p>
+      </div></div>
+      <div id="savedDraftsList" aria-live="polite"></div>
+    </section>
   </section>
 
   <section class="container image-studio" id="imageStudio">
@@ -1220,6 +1249,14 @@
       kindVideo: "سناریوی ویدئوی کوتاه",
       kindProduct: "معرفی و تبلیغ محصول",
       kindIdeas: "پنج ایده خلاقانه",
+      kindCaption: "کپشن و دعوت به اقدام", kindHashtags: "هشتگ‌های مرتبط",
+      kindStory: "مجموعه استوری", kindAd: "متن تبلیغاتی", kindEmail: "ایمیل بازاریابی",
+      kindBlog: "مقاله وبلاگ", kindSeo: "عنوان و توضیحات SEO",
+      kindReply: "پاسخ به مشتری", kindRepurpose: "بازآفرینی محتوا برای چند کانال",
+      outputLanguageLabel: "زبان خروجی", saveDraft: "ذخیره پیش‌نویس",
+      savedDraftsTitle: "پیش‌نویس‌های ذخیره‌شده", savedDraftsDesc: "پیش‌نویس‌ها فقط در همین مرورگر ذخیره می‌شوند.",
+      noSavedDrafts: "هنوز پیش‌نویسی ذخیره نکرده‌ای.", draftSaved: "پیش‌نویس ذخیره شد.",
+      restoreDraft: "بازگردانی", deleteDraft: "حذف",
       example1: "قهوه و دارچین",
       example2: "فروشگاه لباس",
       example3: "مراقبت از پوست",
@@ -1374,6 +1411,14 @@
       kindVideo: "Short video script",
       kindProduct: "Product description",
       kindIdeas: "Five creative ideas",
+      kindCaption: "Caption and call to action", kindHashtags: "Relevant hashtags",
+      kindStory: "Story sequence", kindAd: "Advertising copy", kindEmail: "Marketing email",
+      kindBlog: "Blog article", kindSeo: "SEO title and meta description",
+      kindReply: "Customer reply", kindRepurpose: "Repurpose for multiple channels",
+      outputLanguageLabel: "Output language", saveDraft: "Save draft",
+      savedDraftsTitle: "Saved drafts", savedDraftsDesc: "Drafts are stored only in this browser.",
+      noSavedDrafts: "You have not saved any drafts yet.", draftSaved: "Draft saved.",
+      restoreDraft: "Restore", deleteDraft: "Delete",
       example1: "Coffee and cinnamon",
       example2: "Online clothing store",
       example3: "Skincare",
@@ -1537,7 +1582,7 @@
 
     $("topic").dir = isEnglish ? "ltr" : "rtl";
     $("imagePrompt").dir = isEnglish ? "ltr" : "rtl";
-    $("output").dir = isEnglish ? "ltr" : "rtl";
+    $("output").dir = ["fa", "ar"].includes($("outputLanguage").value) ? "rtl" : "ltr";
 
     $("charCount").textContent =
       $("topic").value.length + (isEnglish ? " / 500" : " از ۵۰۰");
@@ -1798,7 +1843,8 @@
         body: JSON.stringify({
           topic,
           kind,
-          language: currentLanguage
+          language: currentLanguage,
+          outputLanguage: $("outputLanguage").value
         })
       });
 
@@ -1821,8 +1867,9 @@
       generatedContent = String(data.text).trim();
       if (data.usage) renderAccount({ user: { email: $("accountEmail").textContent }, ...data.usage });
       $("output").textContent = generatedContent;
-      $("output").dir = currentLanguage === "en" ? "ltr" : "rtl";
+      $("output").dir = ["fa", "ar"].includes($("outputLanguage").value) ? "rtl" : "ltr";
       $("copyButton").disabled = false;
+      $("saveDraftButton").disabled = false;
       $("successNotice").classList.add("visible");
 
       $("output").scrollIntoView({
@@ -1861,9 +1908,35 @@
     }
   });
 
+  const DRAFTS_KEY = "contentpilot-saved-drafts-v1";
+  function readSavedDrafts() {
+    try { const value = JSON.parse(localStorage.getItem(DRAFTS_KEY) || "[]"); return Array.isArray(value) ? value.filter(x => x && typeof x.id === "string" && typeof x.text === "string").slice(0,30) : []; } catch (_) { return []; }
+  }
+  function renderSavedDrafts() {
+    const list = $("savedDraftsList"); list.replaceChildren();
+    const drafts = readSavedDrafts();
+    if (!drafts.length) { const p=document.createElement("p"); p.className="privacy-note"; p.textContent=t("noSavedDrafts"); list.appendChild(p); return; }
+    drafts.forEach(d => {
+      const row=document.createElement("div"); row.style.cssText="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid var(--border)";
+      const title=document.createElement("strong"); title.textContent=d.topic.slice(0,80); title.style.cssText="flex:1;min-width:140px";
+      const restore=document.createElement("button"); restore.type="button"; restore.className="tool-button"; restore.textContent=t("restoreDraft");
+      restore.addEventListener("click",()=>{ $("topic").value=d.topic; $("kind").value=d.kind; $("outputLanguage").value=d.outputLanguage||"en"; generatedContent=d.text; $("output").textContent=d.text; $("output").dir=["fa","ar"].includes($("outputLanguage").value)?"rtl":"ltr"; $("copyButton").disabled=false; $("saveDraftButton").disabled=false; $("generator").scrollIntoView({behavior:"smooth"}); });
+      const del=document.createElement("button"); del.type="button"; del.className="tool-button"; del.textContent=t("deleteDraft");
+      del.addEventListener("click",()=>{ try{localStorage.setItem(DRAFTS_KEY,JSON.stringify(readSavedDrafts().filter(x=>x.id!==d.id)));}catch(_){} renderSavedDrafts(); });
+      row.append(title,restore,del); list.appendChild(row);
+    });
+  }
+  $("saveDraftButton").addEventListener("click",()=>{
+    if(!generatedContent)return;
+    const drafts=readSavedDrafts(); drafts.unshift({id:crypto.randomUUID(),topic:$("topic").value.trim(),kind:$("kind").value,outputLanguage:$("outputLanguage").value,text:generatedContent,savedAt:new Date().toISOString()});
+    try{localStorage.setItem(DRAFTS_KEY,JSON.stringify(drafts.slice(0,30)));renderSavedDrafts();showToast(t("draftSaved"));}catch(_){showToast(t("copyFail"));}
+  });
+  renderSavedDrafts();
+
   $("clearButton").addEventListener("click", () => {
     generatedContent = "";
     $("output").textContent = "";
+    $("saveDraftButton").disabled = true;
     showPlaceholder();
     $("copyButton").disabled = true;
     hideNotices();
