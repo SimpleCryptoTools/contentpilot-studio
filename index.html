@@ -328,6 +328,19 @@
     .wallet-stat small { display: block; color: var(--muted); font-size: 11px; }
     .wallet-stat strong { display: block; margin-top: 3px; font-size: 21px; color: var(--secondary); }
     .logout-button { border: 1px solid var(--border); border-radius: 10px; background: var(--surface2); color: white; padding: 8px 13px; font-size: 11px; }
+    .help-section { margin: 5px auto 70px; }
+    .help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .help-card { padding: 21px; border: 1px solid var(--border); border-radius: 16px; background: rgba(20,28,49,.72); }
+    .help-card h3 { margin: 0 0 8px; font-size: 15px; color: #c5bcff; }
+    .help-card p, .help-card li { color: var(--muted); font-size: 12px; line-height: 2; }
+    .help-card ul { margin: 8px 0 0; padding-inline-start: 20px; }
+    .faq-list { display: grid; gap: 10px; margin-top: 18px; }
+    .faq-list details { padding: 14px 17px; border: 1px solid var(--border); border-radius: 13px; background: rgba(20,28,49,.72); }
+    .faq-list summary { cursor: pointer; font-size: 13px; font-weight: 700; }
+    .faq-list details p { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 2; }
+    .help-link { display: inline-block; margin-top: 10px; color: #c5bcff; text-decoration: underline; text-underline-offset: 3px; font-size: 12px; }
+    @media(max-width:800px) { .help-grid { grid-template-columns: 1fr; } }
+
     @media(max-width:800px) { .account-layout { grid-template-columns: 1fr; } }
 
     .samples-section { margin-bottom: 75px; }
@@ -771,6 +784,7 @@
       <a href="#generator" data-i18n="navText">ساخت محتوا</a>
       <a href="#imageStudio" data-i18n="navImage">تولید تصویر</a>
       <a href="#pricing" data-i18n="navPricing">تعرفه‌ها</a>
+      <a href="#help" data-i18n="navHelp">راهنما</a>
     </nav>
 
     <div class="nav-actions">
@@ -1033,6 +1047,58 @@
     </div>
   </section>
 
+  <section class="container help-section" id="help">
+    <div class="section-heading">
+      <h2 data-i18n="helpTitle">راهنمای شروع و پاسخ پرسش‌ها</h2>
+      <p data-i18n="helpSubtitle">برای اینکه از اولین استفاده نتیجه بهتری بگیری.</p>
+    </div>
+    <div class="help-grid">
+      <article class="help-card">
+        <h3 data-i18n="helpStartTitle">چطور شروع کنم؟</h3>
+        <ul>
+          <li data-i18n="helpStep1">یک حساب بساز یا وارد حساب خودت شو.</li>
+          <li data-i18n="helpStep2">موضوع، مخاطب و هدف محتوا را در کادر توضیح بده.</li>
+          <li data-i18n="helpStep3">قالب متن یا نوع تصویر را انتخاب و تولید را شروع کن.</li>
+          <li data-i18n="helpStep4">خروجی را بررسی، ویرایش و سپس کپی یا ذخیره کن.</li>
+        </ul>
+      </article>
+      <article class="help-card">
+        <h3 data-i18n="helpPromptTitle">چطور خروجی بهتری بگیرم؟</h3>
+        <ul>
+          <li data-i18n="helpTip1">مشخص کن محصول یا خدمتت چیست.</li>
+          <li data-i18n="helpTip2">مخاطب هدفت را توصیف کن.</li>
+          <li data-i18n="helpTip3">لحن دلخواه مثل صمیمی، رسمی یا هیجان‌انگیز را بنویس.</li>
+          <li data-i18n="helpTip4">هدف و دعوت به اقدام را مشخص کن؛ مثلاً ثبت سفارش یا دنبال‌کردن صفحه.</li>
+        </ul>
+      </article>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary data-i18n="faq1Q">آیا استفاده رایگان است؟</summary>
+        <p data-i18n="faq1A">پس از ثبت‌نام، هر حساب روزانه تا سه استفاده رایگان دارد. تعداد باقی‌مانده در بخش حساب نمایش داده می‌شود.</p>
+      </details>
+      <details>
+        <summary data-i18n="faq2Q">اعتبارهای پولی را چطور بخرم؟</summary>
+        <p data-i18n="faq2A">پرداخت آنلاین و شارژ خودکار اعتبار هنوز فعال نیست. تا زمان اعلام رسمی، هیچ مبلغی برای خرید اعتبار پرداخت نکن.</p>
+      </details>
+      <details>
+        <summary data-i18n="faq3Q">آیا می‌توانم خروجی را بدون بررسی منتشر کنم؟</summary>
+        <p data-i18n="faq3A">خیر؛ نام‌ها، قیمت‌ها، آمار، ادعاهای محصول و اطلاعات حساس را بررسی کن و متن را با واقعیت کسب‌وکارت تطبیق بده.</p>
+      </details>
+      <details>
+        <summary data-i18n="faq4Q">اطلاعاتی که وارد می‌کنم کجا می‌رود؟</summary>
+        <p data-i18n="faq4A">موضوع و توضیح تصویر برای تولید به سرویس هوش مصنوعی ارسال می‌شود. رمزها یا اطلاعات محرمانه و اطلاعات شخصی دیگران را وارد نکن.</p>
+      </details>
+      <details>
+        <summary data-i18n="faq5Q">اگر ساخت متن یا تصویر ناموفق بود چه کنم؟</summary>
+        <p data-i18n="faq5A">یک بار با توضیح کوتاه‌تر و روشن‌تر دوباره امتحان کن. اگر مشکل ادامه داشت، از لینک بازخورد زیر گزارش بده و اطلاعات ورودت را ارسال نکن.</p>
+      </details>
+    </div>
+    <div class="section-heading" style="margin-top:24px">
+      <a class="help-link" href="https://github.com/SimpleCryptoTools/contentpilot-studio/issues" target="_blank" rel="noopener noreferrer" data-i18n="feedbackLink">گزارش مشکل یا ارسال پیشنهاد</a>
+    </div>
+  </section>
+
   <section class="pricing" id="pricing">
     <div class="container">
       <div class="section-heading">
@@ -1204,6 +1270,30 @@
       proFeature3: "پس از آماده‌سازی فعال می‌شود",
       comingSoon: "به‌زودی",
       paymentNote: "قیمت‌ها پیشنهادی‌اند. پرداخت آنلاین و تحویل خودکار اعتبار هنوز فعال نشده است.",
+      navHelp: "راهنما",
+      helpTitle: "راهنمای شروع و پاسخ پرسش‌ها",
+      helpSubtitle: "برای اینکه از اولین استفاده نتیجه بهتری بگیری.",
+      helpStartTitle: "چطور شروع کنم؟",
+      helpStep1: "یک حساب بساز یا وارد حساب خودت شو.",
+      helpStep2: "موضوع، مخاطب و هدف محتوا را در کادر توضیح بده.",
+      helpStep3: "قالب متن یا نوع تصویر را انتخاب و تولید را شروع کن.",
+      helpStep4: "خروجی را بررسی، ویرایش و سپس کپی یا ذخیره کن.",
+      helpPromptTitle: "چطور خروجی بهتری بگیرم؟",
+      helpTip1: "مشخص کن محصول یا خدمتت چیست.",
+      helpTip2: "مخاطب هدفت را توصیف کن.",
+      helpTip3: "لحن دلخواه مثل صمیمی، رسمی یا هیجان‌انگیز را بنویس.",
+      helpTip4: "هدف و دعوت به اقدام را مشخص کن؛ مثلاً ثبت سفارش یا دنبال‌کردن صفحه.",
+      faq1Q: "آیا استفاده رایگان است؟",
+      faq1A: "پس از ثبت‌نام، هر حساب روزانه تا سه استفاده رایگان دارد. تعداد باقی‌مانده در بخش حساب نمایش داده می‌شود.",
+      faq2Q: "اعتبارهای پولی را چطور بخرم؟",
+      faq2A: "پرداخت آنلاین و شارژ خودکار اعتبار هنوز فعال نیست. تا زمان اعلام رسمی، هیچ مبلغی برای خرید اعتبار پرداخت نکن.",
+      faq3Q: "آیا می‌توانم خروجی را بدون بررسی منتشر کنم؟",
+      faq3A: "خیر؛ نام‌ها، قیمت‌ها، آمار، ادعاهای محصول و اطلاعات حساس را بررسی کن و متن را با واقعیت کسب‌وکارت تطبیق بده.",
+      faq4Q: "اطلاعاتی که وارد می‌کنم کجا می‌رود؟",
+      faq4A: "موضوع و توضیح تصویر برای تولید به سرویس هوش مصنوعی ارسال می‌شود. رمزها یا اطلاعات محرمانه و اطلاعات شخصی دیگران را وارد نکن.",
+      faq5Q: "اگر ساخت متن یا تصویر ناموفق بود چه کنم؟",
+      faq5A: "یک بار با توضیح کوتاه‌تر و روشن‌تر دوباره امتحان کن. اگر مشکل ادامه داشت، از لینک بازخورد زیر گزارش بده و اطلاعات ورودت را ارسال نکن.",
+      feedbackLink: "گزارش مشکل یا ارسال پیشنهاد",
       footerText: "ContentPilot Studio · دستیار هوشمند تولید محتوا · نسخه اولیه",
       requiredTopic: "لطفاً موضوع محتوا را وارد کن.",
       topicTooLong: "موضوع باید کمتر از ۵۰۰ نویسه باشد.",
@@ -1334,6 +1424,30 @@
       proFeature3: "Available after launch",
       comingSoon: "Coming soon",
       paymentNote: "Prices are indicative. Online payments and automatic credit delivery are not active yet.",
+      navHelp: "Help",
+      helpTitle: "Getting started and FAQs",
+      helpSubtitle: "A few tips to get better results from your first use.",
+      helpStartTitle: "How do I get started?",
+      helpStep1: "Create an account or sign in.",
+      helpStep2: "Describe your topic, audience and content goal.",
+      helpStep3: "Choose a text format or image type and generate.",
+      helpStep4: "Review and edit the result, then copy or save it.",
+      helpPromptTitle: "How can I get better results?",
+      helpTip1: "Explain what your product or service is.",
+      helpTip2: "Describe your target audience.",
+      helpTip3: "Specify the tone, such as friendly, formal or energetic.",
+      helpTip4: "State the goal and call to action, such as ordering or following your page.",
+      faq1Q: "Is the service free?",
+      faq1A: "After registration, each account gets up to three free uses per day. Your remaining uses appear in your account area.",
+      faq2Q: "How can I buy paid credits?",
+      faq2A: "Online checkout and automatic credit top-ups are not active yet. Do not send money for credits until an official launch announcement.",
+      faq3Q: "Can I publish generated content without reviewing it?",
+      faq3A: "No. Check names, prices, statistics, product claims and sensitive details, and make sure the content matches your business.",
+      faq4Q: "Where does the information I enter go?",
+      faq4A: "Your topic and image description are sent to the AI service for generation. Do not enter passwords, confidential details or other people's personal information.",
+      faq5Q: "What if text or image generation fails?",
+      faq5A: "Try once more with a shorter, clearer prompt. If the issue continues, use the feedback link below. Never include your login details in a report.",
+      feedbackLink: "Report a problem or send a suggestion",
       footerText: "ContentPilot Studio · AI content assistant · Early version",
       requiredTopic: "Please enter a content topic.",
       topicTooLong: "Your topic must be under 500 characters.",
