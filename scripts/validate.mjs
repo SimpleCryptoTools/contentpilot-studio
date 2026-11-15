@@ -16,7 +16,7 @@ function checkJavaScript(source, label) {
   process.stdout.write("PASS " + label + " syntax\n");
 }
 
-const inlineScripts = [...html.matchAll(/<script\\b[^>]*>([\\s\\S]*?)<\\/script>/gi)]
+const inlineScripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1])
   .filter(source => source.trim());
 
@@ -24,7 +24,7 @@ if (inlineScripts.length === 0) throw new Error("No inline application script fo
 inlineScripts.forEach((source, index) => checkJavaScript(source, "index.html script " + (index + 1)));
 checkJavaScript(worker, "worker.js");
 
-const ids = [...html.matchAll(/\\bid="([^"]+)"/g)].map(match => match[1]);
+const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
 if (duplicates.length) throw new Error("Duplicate HTML IDs: " + duplicates.join(", "));
 
