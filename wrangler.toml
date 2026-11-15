@@ -1,0 +1,13 @@
+name = "contentpilot-ai"
+main = "worker.js"
+compatibility_date = "2026-11-15"
+account_id = "b78206be70cab2e8e3c42de666e6d3e7"
+workers_dev = true
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "contentpilot-db"
+database_id = "22b74080-2843-4629-bc37-af0ba790ed08"
