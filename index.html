@@ -1034,6 +1034,63 @@
       </div></div>
       <div id="savedDraftsList" aria-live="polite"></div>
     </section>
+    <section class="panel" id="contentCalendar" aria-labelledby="calendarTitle" style="margin-top:18px">
+      <div class="panel-title"><div class="panel-title-icon">🗓️</div><div>
+        <h3 id="calendarTitle" data-i18n="calendarTitle">Content calendar</h3>
+        <p data-i18n="calendarDescription">Plan upcoming posts and keep your publishing ideas organized.</p>
+      </div></div>
+      <form id="calendarForm" class="form-grid" style="margin-top:14px">
+        <div class="field">
+          <label for="calendarTopic" data-i18n="calendarTopicLabel">Content idea or topic</label>
+          <input id="calendarTopic" type="text" maxlength="180" required data-i18n-placeholder="calendarTopicPlaceholder" placeholder="e.g. Launch a new product collection">
+        </div>
+        <div class="field">
+          <label for="calendarDate" data-i18n="calendarDateLabel">Publish date</label>
+          <input id="calendarDate" type="date" required>
+        </div>
+        <div class="field">
+          <label for="calendarPlatform" data-i18n="calendarPlatformLabel">Channel</label>
+          <select id="calendarPlatform">
+            <option value="Instagram">Instagram</option><option value="TikTok">TikTok</option>
+            <option value="YouTube">YouTube</option><option value="LinkedIn">LinkedIn</option>
+            <option value="Blog">Blog</option><option value="Email">Email</option><option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="calendarKind" data-i18n="calendarFormatLabel">Content format</label>
+          <select id="calendarKind">
+            <option value="social" data-i18n="kindSocial">Social media post</option>
+            <option value="video" data-i18n="kindVideo">Short video script</option>
+            <option value="product" data-i18n="kindProduct">Product description</option>
+            <option value="caption" data-i18n="kindCaption">Caption</option>
+            <option value="story" data-i18n="kindStory">Story sequence</option>
+            <option value="ad" data-i18n="kindAd">Ad copy</option>
+            <option value="email" data-i18n="kindEmail">Marketing email</option>
+            <option value="blog" data-i18n="kindBlog">Blog article</option>
+            <option value="repurpose" data-i18n="kindRepurpose">Repurposed content</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="calendarLanguage" data-i18n="calendarLanguageLabel">Output language</label>
+          <select id="calendarLanguage">
+            <option value="en">English</option><option value="fa">فارسی</option>
+            <option value="es">Español</option><option value="fr">Français</option>
+            <option value="de">Deutsch</option><option value="pt">Português</option>
+            <option value="ar">العربية</option><option value="hi">हिन्दी</option>
+            <option value="ja">日本語</option><option value="it">Italiano</option><option value="tr">Türkçe</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="calendarNotes" data-i18n="calendarNotesLabel">Notes (optional)</label>
+          <input id="calendarNotes" type="text" maxlength="240" data-i18n-placeholder="calendarNotesPlaceholder" placeholder="Audience, key message or call to action">
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <button class="tool-button" type="submit" data-i18n="calendarAddButton">＋ Add to calendar</button>
+        </div>
+      </form>
+      <p class="privacy-note" data-i18n="calendarLocalNotice">Your calendar is saved in this browser only. It is not synced across devices or accounts yet.</p>
+      <div id="calendarEntries" aria-live="polite"></div>
+    </section>
   </section>
 
   <section class="container image-studio" id="imageStudio">
@@ -1257,6 +1314,17 @@
       savedDraftsTitle: "پیش‌نویس‌های ذخیره‌شده", savedDraftsDesc: "پیش‌نویس‌ها فقط در همین مرورگر ذخیره می‌شوند.",
       noSavedDrafts: "هنوز پیش‌نویسی ذخیره نکرده‌ای.", draftSaved: "پیش‌نویس ذخیره شد.",
       restoreDraft: "بازگردانی", deleteDraft: "حذف",
+      calendarTitle: "تقویم تولید محتوا",
+      calendarDescription: "ایده‌های انتشار آینده را برنامه‌ریزی و مرتب کن.",
+      calendarTopicLabel: "موضوع یا ایده محتوا", calendarTopicPlaceholder: "مثلاً معرفی مجموعه جدید محصولات",
+      calendarDateLabel: "تاریخ انتشار", calendarPlatformLabel: "کانال انتشار",
+      calendarFormatLabel: "قالب محتوا", calendarLanguageLabel: "زبان خروجی",
+      calendarNotesLabel: "یادداشت (اختیاری)", calendarNotesPlaceholder: "مخاطب، پیام اصلی یا دعوت به اقدام",
+      calendarAddButton: "＋ افزودن به تقویم", calendarLocalNotice: "تقویم فقط در همین مرورگر ذخیره می‌شود و هنوز بین دستگاه‌ها یا حساب‌ها همگام‌سازی نمی‌شود.",
+      calendarEmpty: "هنوز برنامه‌ای ثبت نشده است.", calendarAdded: "به تقویم اضافه شد.",
+      calendarUse: "ساخت این محتوا", calendarDone: "انجام شد", calendarReopen: "بازگشایی",
+      calendarDelete: "حذف", calendarStatusPlanned: "برنامه‌ریزی‌شده", calendarStatusDone: "انجام‌شده",
+      calendarLimit: "حداکثر ۱۰۰ مورد در تقویم ذخیره می‌شود.",
       example1: "قهوه و دارچین",
       example2: "فروشگاه لباس",
       example3: "مراقبت از پوست",
@@ -1419,6 +1487,17 @@
       savedDraftsTitle: "Saved drafts", savedDraftsDesc: "Drafts are stored only in this browser.",
       noSavedDrafts: "You have not saved any drafts yet.", draftSaved: "Draft saved.",
       restoreDraft: "Restore", deleteDraft: "Delete",
+      calendarTitle: "Content calendar",
+      calendarDescription: "Plan upcoming posts and keep your publishing ideas organized.",
+      calendarTopicLabel: "Content idea or topic", calendarTopicPlaceholder: "e.g. Launch a new product collection",
+      calendarDateLabel: "Publish date", calendarPlatformLabel: "Channel",
+      calendarFormatLabel: "Content format", calendarLanguageLabel: "Output language",
+      calendarNotesLabel: "Notes (optional)", calendarNotesPlaceholder: "Audience, key message or call to action",
+      calendarAddButton: "＋ Add to calendar", calendarLocalNotice: "Your calendar is saved in this browser only. It is not synced across devices or accounts yet.",
+      calendarEmpty: "No items planned yet.", calendarAdded: "Added to your calendar.",
+      calendarUse: "Create this content", calendarDone: "Mark done", calendarReopen: "Reopen",
+      calendarDelete: "Delete", calendarStatusPlanned: "Planned", calendarStatusDone: "Done",
+      calendarLimit: "Your calendar can store up to 100 items.",
       example1: "Coffee and cinnamon",
       example2: "Online clothing store",
       example3: "Skincare",
@@ -1572,6 +1651,11 @@
       const key = element.dataset.i18n;
       if (dictionary[key]) element.textContent = dictionary[key];
     });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
+      const key = element.dataset.i18nPlaceholder;
+      if (dictionary[key]) element.placeholder = dictionary[key];
+    });
+    if (typeof renderContentCalendar === "function") renderContentCalendar();
 
     $("languageButton").textContent = dictionary.languageButton;
     $("topic").placeholder = dictionary.topicPlaceholder;
@@ -1932,6 +2016,105 @@
     try{localStorage.setItem(DRAFTS_KEY,JSON.stringify(drafts.slice(0,30)));renderSavedDrafts();showToast(t("draftSaved"));}catch(_){showToast(t("copyFail"));}
   });
   renderSavedDrafts();
+
+  const CALENDAR_KEY = "contentpilot-calendar-v1";
+  function readCalendarEntries() {
+    try {
+      const items = JSON.parse(localStorage.getItem(CALENDAR_KEY) || "[]");
+      return Array.isArray(items) ? items.filter(item =>
+        item && typeof item.id === "string" &&
+        typeof item.topic === "string" &&
+        /^\d{4}-\d{2}-\d{2}$/.test(item.date) &&
+        typeof item.platform === "string" &&
+        typeof item.kind === "string"
+      ).slice(0, 100) : [];
+    } catch (_) { return []; }
+  }
+  function renderContentCalendar() {
+    const container = $("calendarEntries");
+    if (!container) return;
+    container.replaceChildren();
+    const entries = readCalendarEntries().sort((a,b) => a.date.localeCompare(b.date));
+    if (!entries.length) {
+      const empty = document.createElement("p");
+      empty.className = "privacy-note";
+      empty.textContent = t("calendarEmpty");
+      container.appendChild(empty);
+      return;
+    }
+    entries.forEach(entry => {
+      const card = document.createElement("article");
+      card.style.cssText = "display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;padding:13px 0;border-bottom:1px solid var(--border)";
+      const info = document.createElement("div");
+      info.style.cssText = "flex:1;min-width:190px";
+      const heading = document.createElement("strong");
+      heading.textContent = entry.topic;
+      heading.style.display = "block";
+      const meta = document.createElement("small");
+      const dateText = new Date(entry.date + "T12:00:00").toLocaleDateString(currentLanguage === "fa" ? "fa-IR" : currentLanguage, {dateStyle:"medium"});
+      meta.textContent = dateText + " · " + entry.platform + " · " + entry.kind + " · " + t(entry.done ? "calendarStatusDone" : "calendarStatusPlanned");
+      meta.style.cssText = "display:block;color:var(--muted);margin-top:4px";
+      info.append(heading,meta);
+      if (entry.notes) {
+        const note = document.createElement("p");
+        note.textContent = entry.notes;
+        note.style.cssText = "margin:6px 0 0;color:var(--muted)";
+        info.appendChild(note);
+      }
+      const actions = document.createElement("div");
+      actions.style.cssText = "display:flex;gap:7px;flex-wrap:wrap";
+      const use = document.createElement("button");
+      use.type = "button"; use.className = "tool-button"; use.textContent = t("calendarUse");
+      use.addEventListener("click", () => {
+        $("topic").value = entry.topic;
+        $("kind").value = entry.kind;
+        $("outputLanguage").value = entry.language || "en";
+        $("generator").scrollIntoView({behavior:"smooth"});
+        $("topic").focus({preventScroll:true});
+      });
+      const toggle = document.createElement("button");
+      toggle.type = "button"; toggle.className = "tool-button";
+      toggle.textContent = t(entry.done ? "calendarReopen" : "calendarDone");
+      toggle.addEventListener("click", () => updateCalendarEntry(entry.id, {done:!entry.done}));
+      const remove = document.createElement("button");
+      remove.type = "button"; remove.className = "tool-button"; remove.textContent = t("calendarDelete");
+      remove.addEventListener("click", () => {
+        saveCalendarEntries(readCalendarEntries().filter(item => item.id !== entry.id));
+      });
+      actions.append(use,toggle,remove);
+      card.append(info,actions);
+      container.appendChild(card);
+    });
+  }
+  function saveCalendarEntries(items) {
+    try {
+      localStorage.setItem(CALENDAR_KEY, JSON.stringify(items.slice(0,100)));
+      renderContentCalendar();
+    } catch (_) { showToast(t("copyFail")); }
+  }
+  function updateCalendarEntry(id, changes) {
+    saveCalendarEntries(readCalendarEntries().map(item => item.id === id ? {...item,...changes} : item));
+  }
+  $("calendarDate").value = new Date().toLocaleDateString("en-CA");
+  $("calendarForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const topic = $("calendarTopic").value.trim();
+    const date = $("calendarDate").value;
+    if (!topic || !date) return;
+    const entries = readCalendarEntries();
+    if (entries.length >= 100) { showToast(t("calendarLimit")); return; }
+    entries.push({
+      id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2)),
+      topic, date, platform:$("calendarPlatform").value,
+      kind:$("calendarKind").value, language:$("calendarLanguage").value,
+      notes:$("calendarNotes").value.trim(), done:false
+    });
+    saveCalendarEntries(entries);
+    $("calendarTopic").value = "";
+    $("calendarNotes").value = "";
+    showToast(t("calendarAdded"));
+  });
+  renderContentCalendar();
 
   $("clearButton").addEventListener("click", () => {
     generatedContent = "";
