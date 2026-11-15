@@ -554,7 +554,7 @@ Create only the visual image.
       const contentType = formats[kind] || formats.social;
       const languageName = supportedLanguages[language];
       const systemPrompt = `You are an expert multilingual content strategist and copywriter. Write naturally and idiomatically in ${languageName}. Respect cultural context and local conventions. Return only the final deliverable. Never reveal reasoning or planning. Do not invent facts, statistics, prices, testimonials, product claims, legal promises or policies. Do not make unsupported medical or financial claims. If essential facts are missing, use clearly marked placeholders instead of guessing. Make the result useful, specific and ready for human review before publishing.`;
-      const userPrompt = `/no_think\\n\\nTopic / source material: ${topic}\\nDeliverable: ${contentType}\\nOutput language: ${languageName}\\n\\nUse clear structure, concise language and platform-appropriate formatting. Never pretend to have checked live trends, search volume or analytics. Return only the finished content in ${languageName}.`;
+      const userPrompt = `/no_think\n\nTopic / source material: ${topic}\nDeliverable: ${contentType}\nOutput language: ${languageName}\n\nUse clear structure, concise language and platform-appropriate formatting. Never pretend to have checked live trends, search volume or analytics. Return only the finished content in ${languageName}.`;
 
       const result = await env.AI.run(MODEL_TEXT, {
         messages: [
