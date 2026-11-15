@@ -1039,7 +1039,7 @@
         <h3 id="calendarTitle" data-i18n="calendarTitle">Content calendar</h3>
         <p data-i18n="calendarDescription">Plan upcoming posts and keep your publishing ideas organized.</p>
       </div></div>
-      <form id="calendarForm" class="form-grid" style="margin-top:14px">
+      <form id="calendarForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;margin-top:14px">
         <div class="field">
           <label for="calendarTopic" data-i18n="calendarTopicLabel">Content idea or topic</label>
           <input id="calendarTopic" type="text" maxlength="180" required data-i18n-placeholder="calendarTopicPlaceholder" placeholder="e.g. Launch a new product collection">
@@ -2095,7 +2095,9 @@
   function updateCalendarEntry(id, changes) {
     saveCalendarEntries(readCalendarEntries().map(item => item.id === id ? {...item,...changes} : item));
   }
-  $("calendarDate").value = new Date().toLocaleDateString("en-CA");
+  const today = new Date();
+  const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  $("calendarDate").value = localToday;
   $("calendarForm").addEventListener("submit", event => {
     event.preventDefault();
     const topic = $("calendarTopic").value.trim();
