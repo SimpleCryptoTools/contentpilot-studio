@@ -15,6 +15,20 @@ The Worker is deployed separately from the GitHub Pages frontend.
 
 The account ID and existing D1/Workers AI bindings are defined in `wrangler.toml`. The deploy workflow is manual-only, so a normal commit does not publish the Worker unexpectedly.
 
+## Required D1 migration before deploying reservation changes
+
+The Worker now records every generation reservation durably so a repeated refund cannot credit a wallet or restore free quota twice.
+
+Before deploying a Worker version that uses this lifecycle:
+
+1. Confirm the target is the existing `contentpilot-db` database and take/verify a recoverable backup.
+2. Review `migrations/0001_generation_reservations.sql`.
+3. Apply the migration to the intended environment with Wrangler, for example: `npx wrangler d1 migrations apply contentpilot-db --remote`.
+4. Verify that `generation_reservations` and both indexes exist.
+5. Only then deploy the Worker.
+
+Do not run the migration against production until the database identity and backup/restore path have been independently confirmed. This repository change does not apply the migration or deploy anything.
+
 ## Post-deploy verification
 
 - Confirm the workflow completes successfully.
