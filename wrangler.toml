@@ -11,3 +11,6 @@ binding = "AI"
 binding = "DB"
 database_name = "contentpilot-db"
 database_id = "22b74080-2843-4629-bc37-af0ba790ed08"
+
+[triggers]
+crons = ["17 * * * *"]
