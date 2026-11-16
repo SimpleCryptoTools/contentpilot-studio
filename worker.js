@@ -335,39 +335,48 @@ export async function refundGeneration(db, reservation) {
   if (reservation.type === "free") {
     const results = await db.batch([
       db.prepare(`
-        UPDATE generation_reservations
-        SET status = 'refunded', updated_at = unixepoch()
-        WHERE id = ? AND user_id = ? AND status = 'reserved'
-      `).bind(reservation.id, reservation.userId),
-      db.prepare(`
         UPDATE usage_daily
         SET count = CASE WHEN count > 0 THEN count - 1 ELSE 0 END
         WHERE user_id = ? AND action = 'generation' AND usage_date = ?
+          AND EXISTS (
+            SELECT 1 FROM generation_reservations
+            WHERE id = ? AND user_id = ? AND status = 'reserved'
+          )
+      `).bind(reservation.userId, reservation.date, reservation.id, reservation.userId),
+      db.prepare(`
+        UPDATE generation_reservations
+        SET status = 'refunded', updated_at = unixepoch()
+        WHERE id = ? AND user_id = ? AND status = 'reserved'
           AND changes() = 1
-      `).bind(reservation.userId, reservation.date)
+      `).bind(reservation.id, reservation.userId)
     ]);
-    return Number(results?.[0]?.meta?.changes || 0) === 1;
+    return Number(results?.[1]?.meta?.changes || 0) === 1;
   }
 
   if (reservation.type === "credit") {
     const results = await db.batch([
       db.prepare(`
+        UPDATE wallets
+        SET credits = credits + 1, updated_at = unixepoch()
+        WHERE user_id = ?
+          AND EXISTS (
+            SELECT 1 FROM generation_reservations
+            WHERE id = ? AND user_id = ? AND status = 'reserved'
+          )
+      `).bind(reservation.userId, reservation.id, reservation.userId),
+      db.prepare(`
         UPDATE generation_reservations
         SET status = 'refunded', updated_at = unixepoch()
         WHERE id = ? AND user_id = ? AND status = 'reserved'
+          AND changes() = 1
       `).bind(reservation.id, reservation.userId),
-      db.prepare(`
-        UPDATE wallets
-        SET credits = credits + 1, updated_at = unixepoch()
-        WHERE user_id = ? AND changes() = 1
-      `).bind(reservation.userId),
       db.prepare(`
         INSERT INTO credit_ledger (user_id, order_id, credit_change, reason)
         SELECT ?, NULL, 1, 'AI generation refund'
         WHERE changes() = 1
       `).bind(reservation.userId)
     ]);
-    return Number(results?.[0]?.meta?.changes || 0) === 1;
+    return Number(results?.[1]?.meta?.changes || 0) === 1;
   }
 
   return false;
