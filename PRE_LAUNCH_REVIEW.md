@@ -11,6 +11,8 @@ This review is based on static inspection of the repository. It is not a live pe
 - Registration and login have per-IP and per-account rate limits.
 - Text and image generation require an authenticated session.
 - The Worker handles CORS preflight before its POST-only method guard.
+- The Worker requires JSON POST bodies and rejects declared request bodies larger than 16 KiB.
+- Generated image responses identify PNG/JPEG/WebP from the returned byte signature rather than assuming JPEG.
 - Browser CORS is restricted to the intended apex and www frontend origins; CORS is not treated as authentication.
 - Free usage and paid-credit reservations are enforced server-side.
 - Payment buttons are visibly inactive; the Worker has no payment/top-up endpoint.
@@ -31,7 +33,8 @@ This review is based on static inspection of the repository. It is not a live pe
 - Test registration, login, logout and session expiry with a disposable test account.
 - Test the `me` endpoint and account quota display.
 - Test text generation in Persian and English, plus another supported language.
-- Test image generation and validate generated image downloads.
+- Test image generation for PNG/JPEG/WebP response types and validate generated image downloads.
+- Verify oversized and non-JSON API requests are rejected without consuming quota.
 - Confirm failed AI calls refund quota/credits correctly.
 - Test simultaneous requests at the free-quota boundary.
 - Test on current desktop and mobile browsers.
