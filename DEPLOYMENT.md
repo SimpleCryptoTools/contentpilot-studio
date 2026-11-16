@@ -25,7 +25,8 @@ Before deploying a Worker version that uses this lifecycle:
 2. Review both `migrations/0001_generation_reservations.sql` and `migrations/0002_auth_rate_limits.sql`.
 3. Apply the migrations to the intended environment with Wrangler, for example: `npx wrangler d1 migrations apply contentpilot-db --remote`.
 4. Verify that `generation_reservations`, `auth_rate_limits`, and their indexes exist.
-5. Only then deploy the Worker.
+5. Confirm the hourly auth-rate-limit cleanup cron is enabled after deployment (`17 * * * *`).
+6. Only then deploy the Worker.
 
 Do not run the migration against production until the database identity and backup/restore path have been independently confirmed. This repository change does not apply the migration or deploy anything.
 
