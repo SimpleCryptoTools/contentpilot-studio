@@ -113,20 +113,12 @@ test("fails closed for valid JSON when service bindings are missing", async () =
 test("uses a transactional D1 batch for credit debit and ledger entry", async () => {
   const calls = [];
   const db = {
-    prepare(sql) {
-      return {
-        bind(...args) {
-          return {
-            first: async () => null,
-            sql,
-            args
-          };
-        }
-      };
-    },
+    prepare(sql) { return { sql, bind(...args) { return { sql, args }; } }; },
     async batch(statements) {
       calls.push(statements);
+      if (calls.length === 1) return [{ meta: { changes: 0 } }, { meta: { changes: 0 } }];
       return [
+        { success: true, meta: { changes: 1 } },
         { success: true, meta: { changes: 1 } },
         { success: true, meta: { changes: 1 } }
       ];
@@ -134,24 +126,21 @@ test("uses a transactional D1 batch for credit debit and ledger entry", async ()
   };
 
   const reservation = await (await import(workerModuleUrl)).reserveGeneration(db, "user-1");
-  assert.deepEqual(reservation, { type: "credit", userId: "user-1" });
-  assert.equal(calls.length, 1);
-  assert.ok(calls[0][0].sql.includes("UPDATE wallets"));
-  assert.ok(calls[0][0].sql.includes("credits = credits - 1"));
-  assert.ok(calls[0][1].sql.includes("INSERT INTO credit_ledger"));
-  assert.ok(calls[0][1].sql.includes("WHERE changes() = 1"));
+  assert.equal(reservation.type, "credit");
+  assert.equal(reservation.userId, "user-1");
+  assert.equal(typeof reservation.id, "string");
+  assert.equal(calls.length, 2);
+  assert.equal(calls[1].length, 3);
+  assert.ok(calls[1][0].sql.includes("UPDATE wallets"));
+  assert.ok(calls[1][0].sql.includes("credits = credits - 1"));
+  assert.ok(calls[1][1].sql.includes("INSERT INTO credit_ledger"));
+  assert.ok(calls[1][1].sql.includes("WHERE changes() = 1"));
+  assert.ok(calls[1][2].sql.includes("INSERT INTO generation_reservations"));
 });
-
 test("does not create a credit reservation when the wallet debit changes no row", async () => {
   let batchCalls = 0;
   const db = {
-    prepare(sql) {
-      return {
-        bind(...args) {
-          return { first: async () => null, sql, args };
-        }
-      };
-    },
+    prepare(sql) { return { sql, bind(...args) { return { sql, args }; } }; },
     async batch() {
       batchCalls++;
       return [{ success: true, meta: { changes: 0 } }, { success: true, meta: { changes: 0 } }];
@@ -165,10 +154,8 @@ test("does not create a credit reservation when the wallet debit changes no row"
     })(),
     error => error?.status === 402
   );
-  assert.equal(batchCalls, 1);
+  assert.equal(batchCalls, 2);
 });
-
-
 test("registration works without a Workers AI binding", async () => {
   const batchStatements = [];
   const db = {
