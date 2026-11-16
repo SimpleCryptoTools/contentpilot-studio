@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#10162b">
   <meta name="description" content="Plan, write and repurpose social media posts, captions, videos, product copy, emails and blog content with an AI content studio supporting 11 output languages.">
   <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="canonical" href="https://contentpilot.ir/">
   <meta property="og:title" content="ContentPilot Studio | Global AI Content Studio">
   <meta property="og:description" content="Plan, write and repurpose social media posts, captions, videos, product copy, emails and blog content in 11 output languages.">
@@ -1697,13 +1698,20 @@
   }
 
   function showPlaceholder() {
-    $("output").innerHTML = `
-      <div class="output-placeholder">
-        <span>📝</span>
-        <strong>${t("emptyTitle")}</strong>
-        <small>${t("emptyDesc")}</small>
-      </div>
-    `;
+    const placeholder = document.createElement("div");
+    placeholder.className = "output-placeholder";
+
+    const icon = document.createElement("span");
+    icon.textContent = "📝";
+
+    const title = document.createElement("strong");
+    title.textContent = t("emptyTitle");
+
+    const description = document.createElement("small");
+    description.textContent = t("emptyDesc");
+
+    placeholder.append(icon, title, description);
+    $("output").replaceChildren(placeholder);
   }
 
   function hideNotices() {
