@@ -4,6 +4,7 @@ import { spawnSync } from "node:child_process";
 const html = readFileSync("index.html", "utf8");
 const worker = readFileSync("worker.js", "utf8");
 const reservationMigration = readFileSync("migrations/0001_generation_reservations.sql", "utf8");
+const authRateLimitMigration = readFileSync("migrations/0002_auth_rate_limits.sql", "utf8");
 
 function checkJavaScript(source, label) {
   const result = spawnSync(process.execPath, ["--check", "--input-type=module"], {
@@ -148,5 +149,22 @@ for (const required of [
   }
 }
 process.stdout.write("PASS durable generation reservation migration and state-transition checks\n");
+
+for (const required of [
+  "CREATE TABLE IF NOT EXISTS auth_rate_limits",
+  "rate_key TEXT PRIMARY KEY",
+  "window_started_at INTEGER NOT NULL",
+  "attempts INTEGER NOT NULL DEFAULT 0",
+  "idx_auth_rate_limits_window_started_at"
+]) {
+  if (!authRateLimitMigration.includes(required)) {
+    throw new Error("Auth rate-limit migration is missing: " + required);
+  }
+}
+if (worker.includes("CREATE TABLE IF NOT EXISTS auth_rate_limits") || worker.includes("ensureAuthRateLimitTable")) {
+  throw new Error("Auth rate-limit schema must be managed by migrations, not created during requests");
+}
+process.stdout.write("PASS auth rate-limit migration and request-path DDL checks\\n");
+
 
 process.stdout.write("PASS API routing, origin allowlist, request bounds and image MIME validation\n");
