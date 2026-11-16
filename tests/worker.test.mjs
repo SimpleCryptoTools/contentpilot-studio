@@ -109,3 +109,59 @@ test("fails closed for valid JSON when service bindings are missing", async () =
   });
   assert.equal(response.status, 500);
 });
+
+test("uses a transactional D1 batch for credit debit and ledger entry", async () => {
+  const calls = [];
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...args) {
+          return {
+            first: async () => null,
+            sql,
+            args
+          };
+        }
+      };
+    },
+    async batch(statements) {
+      calls.push(statements);
+      return [
+        { success: true, meta: { changes: 1 } },
+        { success: true, meta: { changes: 1 } }
+      ];
+    }
+  };
+
+  const reservation = await (await import(workerModuleUrl)).reserveGeneration(db, "user-1");
+  assert.deepEqual(reservation, { type: "credit", userId: "user-1" });
+  assert.equal(calls.length, 1);
+  assert.match(calls[0][0].sql, /UPDATE wallets[\\s\\S]*credits = credits - 1/);
+  assert.match(calls[0][1].sql, /INSERT INTO credit_ledger[\\s\\S]*WHERE changes\\(\\) = 1/);
+});
+
+test("does not create a credit reservation when the wallet debit changes no row", async () => {
+  let batchCalls = 0;
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...args) {
+          return { first: async () => null, sql, args };
+        }
+      };
+    },
+    async batch() {
+      batchCalls++;
+      return [{ success: true, meta: { changes: 0 } }, { success: true, meta: { changes: 0 } }];
+    }
+  };
+
+  await assert.rejects(
+    () => (async () => {
+      const module = await import(workerModuleUrl);
+      return module.reserveGeneration(db, "user-2");
+    })(),
+    error => error?.status === 402
+  );
+  assert.equal(batchCalls, 1);
+});
