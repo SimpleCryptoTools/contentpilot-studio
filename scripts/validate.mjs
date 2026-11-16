@@ -52,3 +52,22 @@ for (const [label, value] of [
 if (cname !== "contentpilot.ir") throw new Error("CNAME must be contentpilot.ir");
 process.stdout.write("PASS custom-domain and API-subdomain configuration\n");
 
+const expectedApiUrl = 'const API_URL = "https://api.contentpilot.ir/";';
+if (!html.includes(expectedApiUrl)) throw new Error("Frontend API URL must use the dedicated HTTPS API subdomain");
+if (html.includes("contentpilot-ai.mohannahaddadi363.workers.dev")) throw new Error("Frontend still references the temporary workers.dev URL");
+if (html.includes("simplecryptotools.github.io/contentpilot-studio")) throw new Error("Frontend still references the old GitHub Pages project URL");
+const preflightIndex = worker.indexOf('if (request.method === "OPTIONS")');
+const methodGuardIndex = worker.indexOf('if (request.method !== "POST")');
+if (preflightIndex < 0 || methodGuardIndex < 0 || preflightIndex > methodGuardIndex) {
+  throw new Error("Worker must handle CORS preflight before enforcing POST-only API requests");
+}
+for (const required of [
+  'await authenticate(env.DB, request)',
+  'PBKDF2',
+  'Access-Control-Allow-Headers',
+  'reserveGeneration(env.DB, currentUser.id)'
+]) {
+  if (!worker.includes(required)) throw new Error("Missing Worker security/usage control: " + required);
+}
+if (!html.includes('showToast(t("paymentInactive"))')) throw new Error("Payment UI must remain inactive until a verified payment flow is implemented");
+process.stdout.write("PASS API routing and baseline security guards\\n");
