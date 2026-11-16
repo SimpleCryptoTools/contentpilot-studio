@@ -14,7 +14,7 @@ This review is based on static inspection of the repository. It is not a live pe
 - The Worker validates JSON request bodies before checking service bindings, requires POST, and enforces a 16 KiB limit while reading the actual request stream; it also rejects requests whose declared Content-Length exceeds the limit before reading.
 - Generated image responses identify PNG/JPEG/WebP from the returned byte signature rather than assuming JPEG.
 - Browser CORS is restricted to the intended apex and www frontend origins; CORS is not treated as authentication.
-- Free usage and paid-credit reservations are enforced server-side.
+- Free usage reservations use a conditional atomic upsert; paid-credit debit and ledger insertion execute in one transactional D1 batch, with the ledger insert conditional on exactly one wallet row being debited.
 - Payment buttons are visibly inactive; the Worker has no payment/top-up endpoint.
 - Drafts and the content calendar are stored in browser `localStorage`, not synced to an account.
 
@@ -70,9 +70,9 @@ This review is based on static inspection of the repository. It is not a live pe
 - A penetration test or independent security audit.
 
 ### Automated Worker boundary tests
-- Added Node.js built-in test coverage for allowed apex/www CORS preflight, rejected unapproved origins, POST-only method enforcement, JSON content-type enforcement, the declared Content-Length guard, actual streamed-body size enforcement without a Content-Length header, malformed JSON rejection, and fail-closed behavior when D1/Workers AI bindings are missing.
+- Added Node.js built-in tests for allowed apex/www CORS preflight, rejected unapproved origins, POST-only method enforcement, JSON content-type enforcement, declared and actual streamed-body size limits, malformed JSON rejection, fail-closed behavior without service bindings, and the transactional credit-debit/ledger SQL path (including the no-credit case).
 - The validation GitHub Actions workflow now runs these tests after the static validator.
-- These tests exercise the Worker request boundary with no live D1 or Workers AI bindings; they do not test registration/login persistence, quota accounting, refunds, AI calls or production behavior.
+- These tests use no live D1 or Workers AI bindings. The credit tests inspect the D1 batch statements and mocked result metadata; they do not prove live D1 transaction behavior, registration/login persistence, full quota/refund concurrency, AI calls or production behavior.
 
 ## Release gate
 
