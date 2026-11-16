@@ -264,25 +264,33 @@ async function authenticate(db, request) {
 
 export async function reserveGeneration(db, userId) {
   const today = utcDateString();
+  const reservationId = crypto.randomUUID();
 
-  // Atomically reserve one of the three daily free generations.
-  const freeUse = await db.prepare(`
-    INSERT INTO usage_daily (user_id, action, usage_date, count)
-    VALUES (?, 'generation', ?, 1)
-    ON CONFLICT(user_id, action, usage_date)
-    DO UPDATE SET count = count + 1
-    WHERE usage_daily.count < ?
-    RETURNING count
-  `).bind(userId, today, FREE_DAILY_LIMIT).first();
+  // The quota increment and durable reservation record commit together.
+  // changes() prevents a reservation row when the free quota was exhausted.
+  const freeResults = await db.batch([
+    db.prepare(`
+      INSERT INTO usage_daily (user_id, action, usage_date, count)
+      VALUES (?, 'generation', ?, 1)
+      ON CONFLICT(user_id, action, usage_date)
+      DO UPDATE SET count = count + 1
+      WHERE usage_daily.count < ?
+    `).bind(userId, today, FREE_DAILY_LIMIT),
+    db.prepare(`
+      INSERT INTO generation_reservations
+        (id, user_id, reservation_type, usage_date, status, created_at, updated_at)
+      SELECT ?, ?, 'free', ?, 'reserved', unixepoch(), unixepoch()
+      WHERE changes() = 1
+    `).bind(reservationId, userId, today)
+  ]);
 
-  if (freeUse) {
-    return { type: "free", userId, date: today };
+  if (Number(freeResults?.[0]?.meta?.changes || 0) === 1) {
+    return { id: reservationId, type: "free", userId, date: today };
   }
 
-  // D1 batch is transactional: the ledger insert is conditional on the
-  // immediately preceding debit changing exactly one wallet row. This keeps
-  // wallet and ledger state together even if the Worker is interrupted.
-  const results = await db.batch([
+  const paidReservationId = crypto.randomUUID();
+  // Debit, ledger entry and durable reservation are one D1 transaction.
+  const paidResults = await db.batch([
     db.prepare(`
       UPDATE wallets
       SET credits = credits - 1, updated_at = unixepoch()
@@ -292,44 +300,77 @@ export async function reserveGeneration(db, userId) {
       INSERT INTO credit_ledger (user_id, order_id, credit_change, reason)
       SELECT ?, NULL, -1, 'AI generation'
       WHERE changes() = 1
-    `).bind(userId)
+    `).bind(userId),
+    db.prepare(`
+      INSERT INTO generation_reservations
+        (id, user_id, reservation_type, usage_date, status, created_at, updated_at)
+      SELECT ?, ?, 'credit', ?, 'reserved', unixepoch(), unixepoch()
+      WHERE changes() = 1
+    `).bind(paidReservationId, userId, today)
   ]);
 
-  if (Number(results?.[0]?.meta?.changes || 0) !== 1) {
+  if (Number(paidResults?.[0]?.meta?.changes || 0) !== 1) {
     throw httpError(
       402,
       "سهمیه رایگان امروز تمام شده و اعتبار خریداری‌شده‌ای نداری."
     );
   }
 
-  return { type: "credit", userId };
+  return { id: paidReservationId, type: "credit", userId, date: today };
+}
+
+export async function completeGeneration(db, reservation) {
+  if (!reservation?.id) return false;
+  const result = await db.prepare(`
+    UPDATE generation_reservations
+    SET status = 'consumed', updated_at = unixepoch()
+    WHERE id = ? AND user_id = ? AND status = 'reserved'
+  `).bind(reservation.id, reservation.userId).run();
+  return Number(result?.meta?.changes || 0) === 1;
 }
 
 export async function refundGeneration(db, reservation) {
-  if (!reservation) return;
+  if (!reservation?.id) return false;
 
   if (reservation.type === "free") {
-    await db.prepare(`
-      UPDATE usage_daily
-      SET count = CASE WHEN count > 0 THEN count - 1 ELSE 0 END
-      WHERE user_id = ? AND action = 'generation' AND usage_date = ?
-    `).bind(reservation.userId, reservation.date).run();
-    return;
+    const results = await db.batch([
+      db.prepare(`
+        UPDATE generation_reservations
+        SET status = 'refunded', updated_at = unixepoch()
+        WHERE id = ? AND user_id = ? AND status = 'reserved'
+      `).bind(reservation.id, reservation.userId),
+      db.prepare(`
+        UPDATE usage_daily
+        SET count = CASE WHEN count > 0 THEN count - 1 ELSE 0 END
+        WHERE user_id = ? AND action = 'generation' AND usage_date = ?
+          AND changes() = 1
+      `).bind(reservation.userId, reservation.date)
+    ]);
+    return Number(results?.[0]?.meta?.changes || 0) === 1;
   }
 
   if (reservation.type === "credit") {
-    await db.batch([
+    const results = await db.batch([
+      db.prepare(`
+        UPDATE generation_reservations
+        SET status = 'refunded', updated_at = unixepoch()
+        WHERE id = ? AND user_id = ? AND status = 'reserved'
+      `).bind(reservation.id, reservation.userId),
       db.prepare(`
         UPDATE wallets
         SET credits = credits + 1, updated_at = unixepoch()
-        WHERE user_id = ?
+        WHERE user_id = ? AND changes() = 1
       `).bind(reservation.userId),
       db.prepare(`
         INSERT INTO credit_ledger (user_id, order_id, credit_change, reason)
-        VALUES (?, NULL, 1, 'AI generation refund')
+        SELECT ?, NULL, 1, 'AI generation refund'
+        WHERE changes() = 1
       `).bind(reservation.userId)
     ]);
+    return Number(results?.[0]?.meta?.changes || 0) === 1;
   }
+
+  return false;
 }
 
 async function getUsageSnapshot(db, userId) {
@@ -594,6 +635,9 @@ Create only the visual image.
         }
 
         const usage = await getUsageSnapshot(env.DB, currentUser.id);
+        if (!await completeGeneration(env.DB, reservation)) {
+          throw new Error("Could not finalize the generation reservation.");
+        }
         reservation = null;
         return jsonResponse({
           imageData: "data:" + imageMime + ";base64," + imageResult.image,
@@ -672,6 +716,9 @@ Create only the visual image.
       if (!generatedText) throw new Error("AI returned an empty response.");
 
       const usage = await getUsageSnapshot(env.DB, currentUser.id);
+      if (!await completeGeneration(env.DB, reservation)) {
+        throw new Error("Could not finalize the generation reservation.");
+      }
       reservation = null;
       return jsonResponse({ text: generatedText, usage }, 200, corsHeaders);
 
