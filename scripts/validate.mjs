@@ -35,3 +35,20 @@ for (const required of ["caption:", "hashtags:", "repurpose:", "seo:"]) {
   if (!worker.includes(required)) throw new Error("Missing worker format: " + required);
 }
 process.stdout.write("PASS unique HTML IDs and required product features\n");
+
+const cname = readFileSync("CNAME", "utf8").trim();
+const robots = readFileSync("robots.txt", "utf8");
+const sitemap = readFileSync("sitemap.xml", "utf8");
+for (const [label, value] of [
+  ["GitHub Pages CNAME", cname],
+  ["canonical URL", html.includes('<link rel="canonical" href="https://contentpilot.ir/">') ? "ok" : ""],
+  ["Open Graph URL", html.includes('<meta property="og:url" content="https://contentpilot.ir/">') ? "ok" : ""],
+  ["API subdomain", html.includes('https://api.contentpilot.ir/') ? "ok" : ""],
+  ["robots sitemap", robots.includes("https://contentpilot.ir/sitemap.xml") ? "ok" : ""],
+  ["sitemap canonical host", sitemap.includes("<loc>https://contentpilot.ir/</loc>") ? "ok" : ""]
+]) {
+  if (!value) throw new Error("Missing or incorrect " + label);
+}
+if (cname !== "contentpilot.ir") throw new Error("CNAME must be contentpilot.ir");
+process.stdout.write("PASS custom-domain and API-subdomain configuration\n");
+
