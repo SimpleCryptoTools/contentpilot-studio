@@ -136,8 +136,10 @@ test("uses a transactional D1 batch for credit debit and ledger entry", async ()
   const reservation = await (await import(workerModuleUrl)).reserveGeneration(db, "user-1");
   assert.deepEqual(reservation, { type: "credit", userId: "user-1" });
   assert.equal(calls.length, 1);
-  assert.match(calls[0][0].sql, /UPDATE wallets[\\s\\S]*credits = credits - 1/);
-  assert.match(calls[0][1].sql, /INSERT INTO credit_ledger[\\s\\S]*WHERE changes\\(\\) = 1/);
+  assert.ok(calls[0][0].sql.includes("UPDATE wallets"));
+  assert.ok(calls[0][0].sql.includes("credits = credits - 1"));
+  assert.ok(calls[0][1].sql.includes("INSERT INTO credit_ledger"));
+  assert.ok(calls[0][1].sql.includes("WHERE changes() = 1"));
 });
 
 test("does not create a credit reservation when the wallet debit changes no row", async () => {
