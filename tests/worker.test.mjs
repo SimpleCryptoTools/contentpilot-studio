@@ -622,7 +622,8 @@ test("registration rejects an existing email without creating a second account",
               if (sql.includes("INSERT INTO auth_rate_limits")) return { attempts: 1 };
               if (sql.includes("SELECT id FROM users")) return { id: "existing-user" };
               throw new Error("Unexpected duplicate-registration query: " + sql);
-            }
+            },
+            run: async () => ({ success: true, meta: { changes: 0 } })
           };
         }
       };
