@@ -42,6 +42,21 @@ if (!html.includes('<meta name="referrer" content="strict-origin-when-cross-orig
 if (html.includes('.innerHTML')) {
   throw new Error("Frontend must not write HTML through innerHTML; build placeholder content with DOM APIs");
 }
+for (const required of [
+  'href="#mainContent"',
+  '<main id="mainContent" tabindex="-1">',
+  'for="authEmail"',
+  'for="authPassword"',
+  'skipToContent: "Skip to main content"',
+  'skipToContent: "رفتن به محتوای اصلی"'
+]) {
+  if (!html.includes(required)) throw new Error("Missing keyboard/accessibility support: " + required);
+}
+if (!html.includes(".skip-link:focus") || !html.includes(":focus-visible")) {
+  throw new Error("Keyboard navigation must expose a visible focus state");
+}
+process.stdout.write("PASS skip navigation, localized account labels and keyboard focus checks\\n");
+
 process.stdout.write("PASS frontend DOM-sink and referrer-policy checks\n");
 
 process.stdout.write("PASS unique HTML IDs and required product features\n");
