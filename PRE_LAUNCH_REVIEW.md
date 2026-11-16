@@ -17,6 +17,7 @@ This review is based on static inspection of the repository. It is not a live pe
 - Free usage reservations use a conditional atomic upsert; paid-credit debit and ledger insertion execute in one transactional D1 batch, with the ledger insert conditional on exactly one wallet row being debited.
 - Payment buttons are visibly inactive; the Worker has no payment/top-up endpoint.
 - Drafts and the content calendar are stored in browser `localStorage`, not synced to an account.
+- The empty-output placeholder is assembled with DOM APIs and `textContent` rather than an HTML string sink; a restrictive cross-origin referrer policy is declared in the document.
 
 ## Required before public launch
 
@@ -61,6 +62,13 @@ This review is based on static inspection of the repository. It is not a live pe
 - Keep the Worker deployment workflow manual until a tested release process is agreed.
 - Run the repository validation workflow and confirm a green result before merging.
 
+## Additional security review notes
+
+- Static inspection found the placeholder renderer was the only `innerHTML` write in the frontend. It has been replaced with DOM node creation and `textContent`, and repository validation now rejects reintroducing an `innerHTML` sink.
+- The document now declares `strict-origin-when-cross-origin` as its referrer policy.
+- GitHub Pages does not provide repository-controlled arbitrary HTTP response headers through a static HTML file. A meta tag cannot replace response headers such as Content-Security-Policy, frame-ancestors, X-Content-Type-Options, Permissions-Policy or HSTS. Configure and verify these at a suitable CDN/edge layer after the domain is approved; do not claim they are active yet.
+- The bearer token remains accessible to same-origin JavaScript because it is held in `sessionStorage`. Moving it to an HttpOnly cookie requires a deliberate CSRF/CORS/session architecture change and should not be improvised in this readiness PR.
+- `refundGeneration` currently has no durable per-reservation idempotency key. A duplicate refund invocation could credit a paid wallet more than once or decrement free usage more than once. Do not enable paid purchases or treat generation refunds as replay-safe until a reservation/refund state model is implemented with a schema migration and verified against D1. This is a release blocker, not a property proven by the mocked tests.
 ## Not verified by this review
 
 - Live site availability, live DNS, nameserver activation or SSL issuance.
