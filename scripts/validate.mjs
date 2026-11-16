@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 
 const html = readFileSync("index.html", "utf8");
 const worker = readFileSync("worker.js", "utf8");
+const reservationMigration = readFileSync("migrations/0001_generation_reservations.sql", "utf8");
 
 function checkJavaScript(source, label) {
   const result = spawnSync(process.execPath, ["--check", "--input-type=module"], {
@@ -94,4 +95,27 @@ if (worker.includes('"Access-Control-Allow-Origin": "*"')) {
   throw new Error("Worker CORS must not allow every browser origin");
 }
 if (!html.includes('showToast(t("paymentInactive"))')) throw new Error("Payment UI must remain inactive until a verified payment flow is implemented");
+for (const required of [
+  "CREATE TABLE IF NOT EXISTS generation_reservations",
+  "reservation_type IN ('free', 'credit')",
+  "status IN ('reserved', 'consumed', 'refunded')",
+  "PRIMARY KEY"
+]) {
+  if (!reservationMigration.includes(required)) {
+    throw new Error("Generation reservation migration is missing: " + required);
+  }
+}
+for (const required of [
+  "export async function completeGeneration",
+  "UPDATE generation_reservations",
+  "status = 'consumed'",
+  "status = 'refunded'",
+  "WHERE changes() = 1"
+]) {
+  if (!worker.includes(required)) {
+    throw new Error("Missing durable generation idempotency control: " + required);
+  }
+}
+process.stdout.write("PASS durable generation reservation migration and state-transition checks\n");
+
 process.stdout.write("PASS API routing, origin allowlist, request bounds and image MIME validation\n");
