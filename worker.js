@@ -294,21 +294,39 @@ async function getUsageSnapshot(db, userId) {
 
 export default {
   async fetch(request, env) {
-    // This API uses bearer tokens rather than cookies. A wildcard CORS
-    // response is therefore compatible with cross-origin fetch requests.
-    // CORS is not authentication: every account and generation endpoint
-    // still validates the session token below.
+    // Browser access is limited to the production frontend origins.
+    // Requests without an Origin header (for example, trusted server-side
+    // tools) are not treated as browser cross-origin requests. CORS is not
+    // authentication: protected endpoints still validate bearer sessions.
+    const allowedOrigins = new Set([
+      "https://contentpilot.ir",
+      "https://www.contentpilot.ir"
+    ]);
+    const requestOrigin = request.headers.get("Origin");
+    const originAllowed = !requestOrigin || allowedOrigins.has(requestOrigin);
     const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Max-Age": "86400",
       "Content-Type": "application/json; charset=UTF-8",
-      "Cache-Control": "no-store"
+      "Cache-Control": "no-store",
+      "Vary": "Origin"
     };
+    if (requestOrigin && originAllowed) {
+      corsHeaders["Access-Control-Allow-Origin"] = requestOrigin;
+    }
 
-    // Always answer the browser preflight before parsing a body or checking
-    // authentication. The previous Origin comparison caused OPTIONS 403.
+    // Reject browser origins outside the explicit production allowlist.
+    // This is a browser boundary only; bearer authentication remains required.
+    if (!originAllowed) {
+      return jsonResponse(
+        { error: "مبدأ درخواست مجاز نیست." },
+        403,
+        corsHeaders
+      );
+    }
+
+    // Always answer preflight before parsing a body or checking authentication.
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
