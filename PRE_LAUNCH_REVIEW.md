@@ -69,6 +69,11 @@ This review is based on static inspection of the repository. It is not a live pe
 - End-to-end account flows or payment-provider behavior.
 - A penetration test or independent security audit.
 
+### Automated Worker boundary tests
+- Added Node.js built-in test coverage for allowed apex/www CORS preflight, rejected unapproved origins, POST-only method enforcement, JSON content-type enforcement and the declared 16 KiB Content-Length guard.
+- The validation GitHub Actions workflow now runs these tests after the static validator.
+- These tests exercise the Worker request boundary with no live D1 or Workers AI bindings; they do not test registration/login persistence, quota accounting, refunds, AI calls or production behavior.
+
 ## Release gate
 
 Do not announce a public launch, enable payments, or treat the custom domain as operational until all required domain, functional, account-lifecycle and operational checks above have been completed.
