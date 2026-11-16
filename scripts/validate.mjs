@@ -35,6 +35,14 @@ for (const required of ["calendarForm", "calendarEntries", "savedDraftsList", "o
 for (const required of ["caption:", "hashtags:", "repurpose:", "seo:"]) {
   if (!worker.includes(required)) throw new Error("Missing worker format: " + required);
 }
+if (!html.includes('<meta name="referrer" content="strict-origin-when-cross-origin">')) {
+  throw new Error("Frontend must use a restrictive cross-origin referrer policy");
+}
+if (html.includes('.innerHTML')) {
+  throw new Error("Frontend must not write HTML through innerHTML; build placeholder content with DOM APIs");
+}
+process.stdout.write("PASS frontend DOM-sink and referrer-policy checks\n");
+
 process.stdout.write("PASS unique HTML IDs and required product features\n");
 
 const cname = readFileSync("CNAME", "utf8").trim();
