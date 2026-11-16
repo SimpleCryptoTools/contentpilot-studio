@@ -262,7 +262,7 @@ async function authenticate(db, request) {
   `).bind(tokenHash, now).first();
 }
 
-async function reserveGeneration(db, userId) {
+export async function reserveGeneration(db, userId) {
   const today = utcDateString();
 
   // Atomically reserve one of the three daily free generations.
@@ -279,33 +279,27 @@ async function reserveGeneration(db, userId) {
     return { type: "free", userId, date: today };
   }
 
-  // After free uses are exhausted, atomically consume one purchased credit.
-  const walletUpdate = await db.prepare(`
-    UPDATE wallets
-    SET credits = credits - 1, updated_at = unixepoch()
-    WHERE user_id = ? AND credits > 0
-    RETURNING credits
-  `).bind(userId).first();
+  // D1 batch is transactional: the ledger insert is conditional on the
+  // immediately preceding debit changing exactly one wallet row. This keeps
+  // wallet and ledger state together even if the Worker is interrupted.
+  const results = await db.batch([
+    db.prepare(`
+      UPDATE wallets
+      SET credits = credits - 1, updated_at = unixepoch()
+      WHERE user_id = ? AND credits > 0
+    `).bind(userId),
+    db.prepare(`
+      INSERT INTO credit_ledger (user_id, order_id, credit_change, reason)
+      SELECT ?, NULL, -1, 'AI generation'
+      WHERE changes() = 1
+    `).bind(userId)
+  ]);
 
-  if (!walletUpdate) {
+  if (Number(results?.[0]?.meta?.changes || 0) !== 1) {
     throw httpError(
       402,
       "سهمیه رایگان امروز تمام شده و اعتبار خریداری‌شده‌ای نداری."
     );
-  }
-
-  try {
-    await db.prepare(`
-      INSERT INTO credit_ledger (user_id, order_id, credit_change, reason)
-      VALUES (?, NULL, -1, 'AI generation')
-    `).bind(userId).run();
-  } catch (error) {
-    await db.prepare(`
-      UPDATE wallets
-      SET credits = credits + 1, updated_at = unixepoch()
-      WHERE user_id = ?
-    `).bind(userId).run();
-    throw error;
   }
 
   return { type: "credit", userId };
