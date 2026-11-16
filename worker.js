@@ -418,8 +418,8 @@ export default {
         throw httpError(400, "اطلاعات ارسالی معتبر نیست.");
       }
 
-      if (!env.DB || !env.AI) {
-        throw httpError(500, "اتصال دیتابیس یا هوش مصنوعی تنظیم نشده است.");
+      if (!env.DB) {
+        throw httpError(500, "اتصال دیتابیس تنظیم نشده است.");
       }
 
       const action = String(body.action || "text").trim();
@@ -558,6 +558,9 @@ export default {
         if (prompt.length > 1400) {
           throw httpError(400, "توضیح تصویر بیش از حد طولانی است.");
         }
+        if (!env.AI) {
+          throw httpError(500, "اتصال هوش مصنوعی تنظیم نشده است.");
+        }
 
         reservation = await reserveGeneration(env.DB, currentUser.id);
 
@@ -620,6 +623,9 @@ Create only the visual image.
       if (!topic) throw httpError(400, "لطفاً موضوع محتوا را وارد کن.");
       if (topic.length > 500) {
         throw httpError(400, "موضوع باید کمتر از ۵۰۰ نویسه باشد.");
+      }
+      if (!env.AI) {
+        throw httpError(500, "اتصال هوش مصنوعی تنظیم نشده است.");
       }
 
       reservation = await reserveGeneration(env.DB, currentUser.id);
