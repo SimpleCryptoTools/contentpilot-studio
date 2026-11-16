@@ -562,3 +562,84 @@ test("login rejects a wrong password without creating a session", async () => {
   assert.equal(response.status, 401);
   assert.equal(batchCalls, 0);
 });
+
+
+test("falls back to one paid credit after the third free generation is already reserved", async () => {
+  const statements = [];
+  const db = {
+    prepare(sql) {
+      return {
+        sql,
+        bind(...args) { return { sql, args, first: async () => null }; }
+      };
+    },
+    async batch(batchStatements) {
+      statements.push(batchStatements);
+      return [{ success: true, meta: { changes: 1 } }, { success: true, meta: { changes: 1 } }];
+    }
+  };
+  const module = await import(workerModuleUrl);
+  const reservation = await module.reserveGeneration(db, "quota-user");
+
+  assert.deepEqual(reservation, { type: "credit", userId: "quota-user" });
+  assert.equal(statements.length, 1);
+  assert.equal(statements[0].length, 2);
+  assert.match(statements[0][0].sql, /UPDATE wallets/);
+  assert.match(statements[0][0].sql, /credits > 0/);
+  assert.match(statements[0][1].sql, /INSERT INTO credit_ledger/);
+});
+
+test("registration rejects an existing email without creating a second account", async () => {
+  let registrationBatches = 0;
+  const db = {
+    prepare(sql) {
+      return {
+        sql,
+        run: async () => ({ success: true }),
+        bind(...args) {
+          return {
+            first: async () => {
+              if (sql.includes("INSERT INTO auth_rate_limits")) return { attempts: 1 };
+              if (sql.includes("SELECT id FROM users")) return { id: "existing-user" };
+              throw new Error("Unexpected duplicate-registration query: " + sql);
+            }
+          };
+        }
+      };
+    },
+    async batch() { registrationBatches++; return []; }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json",
+      "CF-Connecting-IP": "192.0.2.40"
+    },
+    body: JSON.stringify({ action: "register", email: "taken@example.com", password: "valid-password-123" })
+  }), { DB: db });
+
+  assert.equal(response.status, 409);
+  assert.equal(registrationBatches, 0);
+});
+
+test("registration rejects a short password before touching D1", async () => {
+  let databaseCalls = 0;
+  const db = {
+    prepare() {
+      databaseCalls++;
+      throw new Error("D1 must not be queried for invalid registration input");
+    }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ action: "register", email: "short-pass@example.com", password: "tiny" })
+  }), { DB: db });
+
+  assert.equal(response.status, 400);
+  assert.equal(databaseCalls, 0);
+});
