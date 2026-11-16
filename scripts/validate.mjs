@@ -5,7 +5,7 @@ const html = readFileSync("index.html", "utf8");
 const worker = readFileSync("worker.js", "utf8");
 
 function checkJavaScript(source, label) {
-  const result = spawnSync(process.execPath, ["--check"], {
+  const result = spawnSync(process.execPath, ["--check", "--input-type=module"], {
     input: source,
     encoding: "utf8"
   });
