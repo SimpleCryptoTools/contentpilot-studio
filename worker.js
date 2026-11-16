@@ -5,10 +5,8 @@
  *   DB  -> D1 database (contentpilot-db)
  *
  * Existing D1 tables: users, sessions, wallets, orders, credit_ledger, usage_daily.
- * Apply migrations/0001_generation_reservations.sql before deploying this version.
- *
- * The auth_rate_limits table is created automatically on the first
- * register/login request.
+ * Apply migrations/0001_generation_reservations.sql and
+ * migrations/0002_auth_rate_limits.sql before deploying this version.
  *
  * Security notes:
  * - Text/image generation requires a valid session.
@@ -157,16 +155,6 @@ function utcDateString() {
   return new Date().toISOString().slice(0, 10);
 }
 
-async function ensureAuthRateLimitTable(db) {
-  await db.prepare(`
-    CREATE TABLE IF NOT EXISTS auth_rate_limits (
-      rate_key TEXT PRIMARY KEY,
-      window_started_at INTEGER NOT NULL,
-      attempts INTEGER NOT NULL DEFAULT 0
-    )
-  `).run();
-}
-
 async function bumpRateLimit(db, rateKey, maxAttempts, windowSeconds) {
   const now = Math.floor(Date.now() / 1000);
   const resetBefore = now - windowSeconds;
@@ -189,8 +177,6 @@ async function bumpRateLimit(db, rateKey, maxAttempts, windowSeconds) {
 }
 
 export async function enforceAuthRateLimit(db, request, email, action) {
-  await ensureAuthRateLimitTable(db);
-
   const ip = request.headers.get("CF-Connecting-IP") || "unknown-client";
   const normalizedEmail = String(email || "unknown").trim().toLowerCase();
   const ipKey = await sha256(`cp:${action}:ip:${ip}`);
