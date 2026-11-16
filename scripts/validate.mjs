@@ -57,6 +57,17 @@ if (!html.includes(".skip-link:focus") || !html.includes(":focus-visible")) {
 }
 process.stdout.write("PASS skip navigation, localized account labels and keyboard focus checks\\n");
 
+const formControls = [...html.matchAll(/<(input|select|textarea)\b([^>]*)>/gi)];
+for (const control of formControls) {
+  const id = (control[2].match(/\bid="([^"]+)"/i) || [])[1];
+  const hasAccessibleName = /\baria-label=|\baria-labelledby=/i.test(control[2]) ||
+    (id && html.includes('<label for="' + id + '"'));
+  if (!hasAccessibleName) {
+    throw new Error("Form control is missing an accessible label: " + (id || control[1]));
+  }
+}
+process.stdout.write("PASS accessible names for all form controls\n");
+
 process.stdout.write("PASS frontend DOM-sink and referrer-policy checks\n");
 
 process.stdout.write("PASS unique HTML IDs and required product features\n");
