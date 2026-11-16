@@ -733,3 +733,40 @@ test("invalid generation reservation types cannot trigger a refund", async () =>
   assert.equal(refunded, false);
   assert.equal(databaseTouched, false);
 });
+
+
+test("auth rate-limit cleanup runs on the scheduled event, not during authentication requests", async () => {
+  const calls = [];
+  let waited = null;
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...args) {
+          return {
+            run: async () => {
+              calls.push({ sql, args });
+              return { success: true, meta: { changes: 2 } };
+            }
+          };
+        }
+      };
+    }
+  };
+  worker.scheduled({}, { DB: db }, {
+    waitUntil(promise) { waited = promise; }
+  });
+  assert.ok(waited instanceof Promise);
+  await waited;
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].sql, /DELETE FROM auth_rate_limits WHERE window_started_at < \?/);
+  assert.equal(calls[0].args.length, 1);
+  assert.ok(Number.isInteger(calls[0].args[0]));
+});
+
+test("scheduled auth cleanup safely skips when D1 is unavailable", async () => {
+  let waitUntilCalled = false;
+  await worker.scheduled({}, {}, {
+    waitUntil() { waitUntilCalled = true; }
+  });
+  assert.equal(waitUntilCalled, false);
+});
