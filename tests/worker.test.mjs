@@ -228,7 +228,7 @@ test("reserves free quota and durable reservation in one D1 batch", async () => 
   const reservation = await module.reserveGeneration(db, "free-user");
   assert.equal(reservation.type, "free");
   assert.equal(reservation.userId, "free-user");
-  assert.match(reservation.date, /^\\d{4}-\\d{2}-\\d{2}$/);
+  assert.match(reservation.date, /^\d{4}-\d{2}-\d{2}$/);
   assert.equal(typeof reservation.id, "string");
   assert.equal(reservation.id.length, 36);
   assert.equal(batches.length, 1);
@@ -260,7 +260,7 @@ test("free generation refund is guarded by durable reservation state", async () 
   assert.match(batches[0][0].sql, /status = 'refunded'/);
   assert.match(batches[0][0].sql, /status = 'reserved'/);
   assert.match(batches[0][1].sql, /UPDATE usage_daily/);
-  assert.match(batches[0][1].sql, /changes\\(\\) = 1/);
+  assert.ok(batches[0][1].sql.includes("changes() = 1"));
 });
 test("paid generation refund is guarded and credits wallet plus ledger transactionally", async () => {
   const batches = [];
@@ -283,10 +283,10 @@ test("paid generation refund is guarded and credits wallet plus ledger transacti
   assert.match(batches[0][0].sql, /UPDATE generation_reservations/);
   assert.match(batches[0][0].sql, /status = 'refunded'/);
   assert.match(batches[0][1].sql, /UPDATE wallets/);
-  assert.match(batches[0][1].sql, /credits = credits \\+ 1/);
-  assert.match(batches[0][1].sql, /changes\\(\\) = 1/);
+  assert.ok(batches[0][1].sql.includes("credits = credits + 1"));
+  assert.ok(batches[0][1].sql.includes("changes() = 1"));
   assert.match(batches[0][2].sql, /INSERT INTO credit_ledger/);
-  assert.match(batches[0][2].sql, /WHERE changes\\(\\) = 1/);
+  assert.ok(batches[0][2].sql.includes("WHERE changes() = 1"));
 });
 test("generation completion only transitions an active reservation once", async () => {
   const calls = [];
