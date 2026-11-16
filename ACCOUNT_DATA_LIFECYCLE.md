@@ -18,7 +18,7 @@ This is a repository-level inventory based on SQL statements and browser storage
 | D1 auth_rate_limits | Hashed rate_key, window start and attempt count | Global IP/account rate-limit counters; no user foreign key | Hourly cleanup removes counters older than two days |
 | Browser localStorage | contentpilot-saved-drafts-v1, contentpilot-calendar-v1 | Device/browser-local drafts and calendar; not stored in the account database | Must be addressed in user-facing deletion guidance |
 | Browser localStorage | contentpilot-language | UI language preference | Preference only; not account data |
-| Browser sessionStorage | contentpilot-session (session bearer token) | JavaScript-readable session token | Frontend logout clears it; server logout revokes the matching token |
+| Browser sessionStorage | contentpilot-access-token (session bearer token) | JavaScript-readable session token | Frontend logout clears it; server logout revokes the matching token |
 
 ## Required investigation before implementing deletion
 
