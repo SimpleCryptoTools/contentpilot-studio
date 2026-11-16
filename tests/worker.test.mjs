@@ -247,9 +247,9 @@ test("reserves a free generation before falling back to paid credits", async () 
   const reservation = await module.reserveGeneration(db, "free-user");
   assert.equal(reservation.type, "free");
   assert.equal(reservation.userId, "free-user");
-  assert.match(reservation.date, /^\\d{4}-\\d{2}-\\d{2}$/);
+  assert.match(reservation.date, /^\d{4}-\d{2}-\d{2}$/);
   assert.equal(batchCalls, 0);
-  assert.match(prepared[0].sql, /ON CONFLICT\\(user_id, action, usage_date\\)/);
+  assert.match(prepared[0].sql, /ON CONFLICT\(user_id, action, usage_date\)/);
   assert.match(prepared[0].sql, /usage_daily.count < \?/);
   assert.deepEqual(prepared[0].args.slice(0, 1), ["free-user"]);
 });
@@ -297,7 +297,7 @@ test("refunds a failed paid generation with a transactional wallet and ledger ba
   assert.equal(batches.length, 1);
   assert.equal(batches[0].length, 2);
   assert.match(batches[0][0].sql, /UPDATE wallets/);
-  assert.match(batches[0][0].sql, /credits = credits \\+ 1/);
+  assert.match(batches[0][0].sql, /credits = credits \+ 1/);
   assert.match(batches[0][1].sql, /INSERT INTO credit_ledger/);
   assert.match(batches[0][1].sql, /AI generation refund/);
 });
