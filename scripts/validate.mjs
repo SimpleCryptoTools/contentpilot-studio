@@ -168,3 +168,15 @@ process.stdout.write("PASS auth rate-limit migration and request-path DDL checks
 
 
 process.stdout.write("PASS API routing, origin allowlist, request bounds and image MIME validation\n");
+
+if (!worker.includes('async scheduled(_controller, env, ctx)') ||
+    !worker.includes('DELETE FROM auth_rate_limits WHERE window_started_at < ?')) {
+  throw new Error("Auth rate-limit expiry cleanup must run in the scheduled Worker handler");
+}
+if (/Math\.floor\(Date\.now\(\) \/ 1000\) % 17/.test(worker)) {
+  throw new Error("Auth rate-limit cleanup must not execute on the request path");
+}
+if (!readFileSync("wrangler.toml", "utf8").includes('crons = ["17 * * * *"]')) {
+  throw new Error("Worker must schedule hourly auth rate-limit cleanup");
+}
+process.stdout.write("PASS scheduled auth rate-limit expiry cleanup checks\\n");
