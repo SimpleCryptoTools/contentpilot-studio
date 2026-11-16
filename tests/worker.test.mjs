@@ -7,7 +7,7 @@ const workerSource = await readFile(new URL("../worker.js", import.meta.url), "u
 const workerModuleUrl = "data:text/javascript;base64," + Buffer.from(workerSource).toString("base64");
 const worker = (await import(workerModuleUrl)).default;
 
-const env = {}; // These boundary checks must run before DB/AI bindings are needed.
+const env = { DB: {}, AI: {} }; // Truthy bindings let body-parser checks run; these cases never query either service.
 const call = (url, init) => worker.fetch(new Request(url, init), env);
 
 test("allows CORS preflight from the apex frontend", async () => {
