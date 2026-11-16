@@ -415,14 +415,6 @@ export default {
       );
     }
 
-    if (!env.DB || !env.AI) {
-      return jsonResponse(
-        { error: "اتصال دیتابیس یا هوش مصنوعی تنظیم نشده است." },
-        500,
-        corsHeaders
-      );
-    }
-
     let reservation = null;
     let userForRefund = null;
 
@@ -430,6 +422,10 @@ export default {
       const body = await readJsonBody(request, 16 * 1024);
       if (!body || typeof body !== "object" || Array.isArray(body)) {
         throw httpError(400, "اطلاعات ارسالی معتبر نیست.");
+      }
+
+      if (!env.DB || !env.AI) {
+        throw httpError(500, "اتصال دیتابیس یا هوش مصنوعی تنظیم نشده است.");
       }
 
       const action = String(body.action || "text").trim();
