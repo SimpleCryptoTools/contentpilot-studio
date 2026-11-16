@@ -379,3 +379,184 @@ test("login is rate limited when the account attempt threshold is exceeded", asy
   assert.match(payload.error, /۱۵ دقیقه/);
 });
 
+
+
+async function testPasswordHash(password, saltHex) {
+  const salt = new Uint8Array((saltHex.match(/.{2}/g) || []).map(pair => parseInt(pair, 16)));
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" }, key, 256);
+  return Array.from(new Uint8Array(bits)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+test("successful login creates a hashed-token session and returns the account snapshot", async () => {
+  const salt = "00112233445566778899aabbccddeeff";
+  const password = "correct-horse-battery";
+  const passwordHash = await testPasswordHash(password, salt);
+  const batches = [];
+  const sqlCalls = [];
+  const db = {
+    prepare(sql) {
+      sqlCalls.push(sql);
+      return {
+        sql,
+        args: [],
+        bind(...args) {
+          this.args = args;
+          return this;
+        },
+        async run() { return { success: true, meta: { changes: 1 } }; },
+        async first() {
+          if (sql.includes("INSERT INTO auth_rate_limits")) return { attempts: 1 };
+          if (sql.includes("FROM users WHERE email")) {
+            return { id: "user-login", email: "login@example.com", password_hash: passwordHash, password_salt: salt, status: "active" };
+          }
+          if (sql.includes("SELECT credits FROM wallets")) return { credits: 7 };
+          if (sql.includes("SELECT count FROM usage_daily")) return { count: 1 };
+          throw new Error("Unexpected successful-login query: " + sql);
+        }
+      };
+    },
+    async batch(statements) {
+      batches.push(statements);
+      return statements.map(() => ({ success: true, meta: { changes: 1 } }));
+    }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json",
+      "CF-Connecting-IP": "192.0.2.30"
+    },
+    body: JSON.stringify({ action: "login", email: "LOGIN@example.com", password })
+  }), { DB: db });
+
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.ok, true);
+  assert.deepEqual(payload.user, { id: "user-login", email: "login@example.com" });
+  assert.equal(payload.credits, 7);
+  assert.equal(payload.freeRemaining, 2);
+  assert.equal(typeof payload.accessToken, "string");
+  assert.equal(payload.accessToken.length, 64);
+  assert.equal(batches.length, 1);
+  assert.equal(batches[0].length, 2);
+  assert.match(batches[0][0].sql, /DELETE FROM sessions/);
+  assert.match(batches[0][1].sql, /INSERT INTO sessions/);
+  assert.ok(!sqlCalls.some(sql => /SELECT token_hash FROM sessions/.test(sql)));
+});
+
+test("logout revokes the supplied bearer session by deleting its token hash", async () => {
+  const deleted = [];
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...args) {
+          return {
+            run: async () => { deleted.push({ sql, args }); return { success: true, meta: { changes: 1 } }; }
+          };
+        }
+      };
+    }
+  };
+  const token = "a".repeat(64);
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token
+    },
+    body: JSON.stringify({ action: "logout" })
+  }), { DB: db });
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true });
+  assert.equal(deleted.length, 1);
+  assert.match(deleted[0].sql, /DELETE FROM sessions WHERE token_hash = \?/);
+  assert.equal(deleted[0].args[0].length, 64);
+  assert.notEqual(deleted[0].args[0], token);
+});
+
+test("authenticated me returns account, wallet and remaining free quota", async () => {
+  const token = "b".repeat(64);
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+  const tokenHash = Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+  const queries = [];
+  const db = {
+    prepare(sql) {
+      queries.push(sql);
+      return {
+        bind(...args) {
+          return {
+            first: async () => {
+              if (sql.includes("FROM sessions s")) {
+                assert.equal(args[0], tokenHash);
+                return { id: "user-me", email: "me@example.com", status: "active" };
+              }
+              if (sql.includes("SELECT credits FROM wallets")) return { credits: 4 };
+              if (sql.includes("SELECT count FROM usage_daily")) return { count: 2 };
+              if (sql.includes("SELECT email FROM users")) return { email: "me@example.com" };
+              throw new Error("Unexpected me query: " + sql);
+            }
+          };
+        }
+      };
+    }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token
+    },
+    body: JSON.stringify({ action: "me" })
+  }), { DB: db });
+
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.user.id, "user-me");
+  assert.equal(payload.user.email, "me@example.com");
+  assert.equal(payload.credits, 4);
+  assert.equal(payload.freeRemaining, 1);
+  assert.equal(payload.freeDailyLimit, 3);
+  assert.ok(queries.some(sql => sql.includes("FROM sessions s")));
+});
+
+test("login rejects a wrong password without creating a session", async () => {
+  const salt = "ffeeddccbbaa99887766554433221100";
+  const passwordHash = await testPasswordHash("the-correct-password", salt);
+  let batchCalls = 0;
+  const db = {
+    prepare(sql) {
+      return {
+        bind() {
+          return {
+            run: async () => ({ success: true }),
+            first: async () => {
+              if (sql.includes("INSERT INTO auth_rate_limits")) return { attempts: 1 };
+              if (sql.includes("FROM users WHERE email")) {
+                return { id: "user-wrong-pass", email: "wrong@example.com", password_hash: passwordHash, password_salt: salt, status: "active" };
+              }
+              throw new Error("Unexpected wrong-password query: " + sql);
+            }
+          };
+        }
+      };
+    },
+    async batch() { batchCalls++; return []; }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json",
+      "CF-Connecting-IP": "192.0.2.31"
+    },
+    body: JSON.stringify({ action: "login", email: "wrong@example.com", password: "incorrect-password" })
+  }), { DB: db });
+
+  assert.equal(response.status, 401);
+  assert.equal(batchCalls, 0);
+});
