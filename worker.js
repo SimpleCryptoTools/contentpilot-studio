@@ -4,8 +4,8 @@
  *   AI  -> Workers AI
  *   DB  -> D1 database (contentpilot-db)
  *
- * Expected D1 tables (already created by the user):
- *   users, sessions, wallets, orders, credit_ledger, usage_daily
+ * Existing D1 tables: users, sessions, wallets, orders, credit_ledger, usage_daily.
+ * Apply migrations/0001_generation_reservations.sql before deploying this version.
  *
  * The auth_rate_limits table is created automatically on the first
  * register/login request.
