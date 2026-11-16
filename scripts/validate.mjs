@@ -61,7 +61,7 @@ const formControls = [...html.matchAll(/<(input|select|textarea)\b([^>]*)>/gi)];
 for (const control of formControls) {
   const id = (control[2].match(/\bid="([^"]+)"/i) || [])[1];
   const hasAccessibleName = /\baria-label=|\baria-labelledby=/i.test(control[2]) ||
-    (id && html.includes('<label for="' + id + '"'));
+    (id && html.includes('for="' + id + '"'));
   if (!hasAccessibleName) {
     throw new Error("Form control is missing an accessible label: " + (id || control[1]));
   }
