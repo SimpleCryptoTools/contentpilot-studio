@@ -66,9 +66,16 @@ for (const required of [
   'await authenticate(env.DB, request)',
   'PBKDF2',
   'Access-Control-Allow-Headers',
-  'reserveGeneration(env.DB, currentUser.id)'
+  'reserveGeneration(env.DB, currentUser.id)',
+  'https://contentpilot.ir',
+  'https://www.contentpilot.ir',
+  '"Vary": "Origin"',
+  'if (!originAllowed)'
 ]) {
   if (!worker.includes(required)) throw new Error("Missing Worker security/usage control: " + required);
 }
+if (worker.includes('"Access-Control-Allow-Origin": "*"')) {
+  throw new Error("Worker CORS must not allow every browser origin");
+}
 if (!html.includes('showToast(t("paymentInactive"))')) throw new Error("Payment UI must remain inactive until a verified payment flow is implemented");
-process.stdout.write("PASS API routing and baseline security guards\n");
+process.stdout.write("PASS API routing, origin allowlist and baseline security guards\n");
