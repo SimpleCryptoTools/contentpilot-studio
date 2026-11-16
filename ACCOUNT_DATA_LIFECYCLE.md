@@ -9,7 +9,7 @@ This is a repository-level inventory based on SQL statements and browser storage
 | Data store | Known data | Ownership / behavior | Deletion status |
 | --- | --- | --- | --- |
 | D1 users | id, email, password_hash, password_salt, status are referenced by registration/login | Account identity and authentication | No account-deletion endpoint |
-| D1 sessions | token_hash, user_id, expires_at | Bearer-session hashes; logout deletes the presented token; authentication rejects expired sessions | No account-wide revocation/deletion flow |
+| D1 sessions | token_hash, user_id, expires_at | Bearer-session hashes; logout deletes the presented token; authentication rejects expired sessions. Login prunes expired sessions only for the account logging in; there is no global expired-session cleanup job | No account-wide revocation/deletion flow; expired rows may remain until that user logs in or an approved cleanup is implemented |
 | D1 wallets | user_id, credits, updated_at | Current purchased-credit balance | Must reconcile before deletion |
 | D1 orders | Referenced through credit_ledger.order_id; full columns and retention rules are not present in this repository | Likely payment/order records; exact schema is unverified | Do not delete or cascade blindly |
 | D1 credit_ledger | user_id, order_id, credit_change, reason | Credit accounting/audit history | Retention and anonymization policy required before deletion |
