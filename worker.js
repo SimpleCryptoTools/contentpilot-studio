@@ -196,14 +196,6 @@ export async function enforceAuthRateLimit(db, request, email, action) {
     15 * 60
   );
 
-  // Occasional cleanup of old hashed counters.
-  if (Math.floor(Date.now() / 1000) % 17 === 0) {
-    const cutoff = Math.floor(Date.now() / 1000) - 2 * 86400;
-    await db.prepare(
-      "DELETE FROM auth_rate_limits WHERE window_started_at < ?"
-    ).bind(cutoff).run();
-  }
-
   if (!ipAllowed || !accountAllowed) {
     throw httpError(
       429,
@@ -737,5 +729,16 @@ Create only the visual image.
 
       return jsonResponse({ error: message }, status, corsHeaders);
     }
+  },
+
+  // Expired hashed counters are pruned hourly, outside user-facing requests.
+  async scheduled(_controller, env, ctx) {
+    if (!env.DB) return;
+    const cutoff = Math.floor(Date.now() / 1000) - 2 * 86400;
+    ctx.waitUntil(
+      env.DB.prepare(
+        "DELETE FROM auth_rate_limits WHERE window_started_at < ?"
+      ).bind(cutoff).run()
+    );
   }
 };
