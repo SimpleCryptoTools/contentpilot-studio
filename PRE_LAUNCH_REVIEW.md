@@ -8,13 +8,13 @@ This review is based on static inspection of the repository. It is not a live pe
 - The frontend stores its session bearer token in `sessionStorage`.
 - Passwords are derived with PBKDF2-SHA-256 and per-user random salts.
 - Session tokens are random values; only SHA-256 hashes are stored in D1.
-- Registration and login have per-IP and per-account rate limits. Their hashed counters are provisioned by `migrations/0002_auth_rate_limits.sql`; request handlers no longer run schema DDL.
+- Registration and login have per-IP and per-account rate limits. Their hashed counters are provisioned by `migrations/0002_auth_rate_limits.sql`; expiry cleanup runs hourly through the Worker scheduled handler, not on the authentication request path.
 - Text and image generation require an authenticated session.
 - The Worker handles CORS preflight before its POST-only method guard.
 - The Worker validates JSON request bodies before checking service bindings, requires POST, and enforces a 16 KiB limit while reading the actual request stream; it also rejects requests whose declared Content-Length exceeds the limit before reading.
 - Generated image responses identify PNG/JPEG/WebP from the returned byte signature rather than assuming JPEG.
 - Browser CORS is restricted to the intended apex and www frontend origins; CORS is not treated as authentication.
-- Authentication rate-limit storage is managed by `migrations/0002_auth_rate_limits.sql`, including an index for periodic expiry cleanup; this migration has not been applied to production D1.
+- Authentication rate-limit storage is managed by `migrations/0002_auth_rate_limits.sql`, including an index for hourly expiry cleanup. The Worker cron is configured for minute 17 of each hour; this migration has not been applied to production D1.
 - Free and paid generation reservations now create durable `generation_reservations` rows in the same D1 batch as quota reservation or wallet debit; completion and refund use conditional state transitions so only a still-reserved operation can be finalized or refunded. A migration is committed, but it has not been applied to the production D1 database or verified with live D1 concurrency tests.
 - Payment buttons are visibly inactive; the Worker has no payment/top-up endpoint.
 - Drafts and the content calendar are stored in browser `localStorage`, not synced to an account.
