@@ -7,7 +7,7 @@ const workerSource = await readFile(new URL("../worker.js", import.meta.url), "u
 const workerModuleUrl = "data:text/javascript;base64," + Buffer.from(workerSource).toString("base64");
 const worker = (await import(workerModuleUrl)).default;
 
-const env = { DB: {}, AI: {} }; // Truthy bindings let body-parser checks run; these cases never query either service.
+const env = {}; // Boundary tests use no live D1 or Workers AI services.
 const call = (url, init) => worker.fetch(new Request(url, init), env);
 
 test("allows CORS preflight from the apex frontend", async () => {
@@ -96,4 +96,16 @@ test("returns a client error for malformed JSON", async () => {
     body: "{invalid"
   });
   assert.equal(response.status, 400);
+});
+
+test("fails closed for valid JSON when service bindings are missing", async () => {
+  const response = await call("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ action: "me" })
+  });
+  assert.equal(response.status, 500);
 });
