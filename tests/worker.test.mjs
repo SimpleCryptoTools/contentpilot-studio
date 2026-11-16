@@ -255,7 +255,7 @@ test("free generation refund is guarded by durable reservation state", async () 
   assert.equal(batches.length, 1);
   assert.equal(batches[0].length, 2);
   assert.match(batches[0][0].sql, /UPDATE usage_daily/);
-  assert.match(batches[0][0].sql, /EXISTS \\(/);
+  assert.ok(batches[0][0].sql.includes("EXISTS ("));
   assert.match(batches[0][1].sql, /UPDATE generation_reservations/);
   assert.match(batches[0][1].sql, /status = 'refunded'/);
   assert.match(batches[0][1].sql, /status = 'reserved'/);
@@ -279,7 +279,7 @@ test("paid generation refund is guarded and credits wallet plus ledger transacti
   assert.equal(batches[0].length, 3);
   assert.match(batches[0][0].sql, /UPDATE wallets/);
   assert.ok(batches[0][0].sql.includes("credits = credits + 1"));
-  assert.match(batches[0][0].sql, /EXISTS \\(/);
+  assert.ok(batches[0][0].sql.includes("EXISTS ("));
   assert.match(batches[0][1].sql, /UPDATE generation_reservations/);
   assert.match(batches[0][1].sql, /status = 'refunded'/);
   assert.ok(batches[0][1].sql.includes("changes() = 1"));
