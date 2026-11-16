@@ -16,8 +16,9 @@ function checkJavaScript(source, label) {
   process.stdout.write("PASS " + label + " syntax\n");
 }
 
-const inlineScripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)]
-  .map(match => match[1])
+const inlineScripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+  .filter(match => !/\btype\s*=\s*["']application\/ld\+json["']/i.test(match[1]))
+  .map(match => match[2])
   .filter(source => source.trim());
 
 if (inlineScripts.length === 0) throw new Error("No inline application script found");
