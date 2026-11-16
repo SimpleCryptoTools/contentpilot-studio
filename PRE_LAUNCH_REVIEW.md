@@ -24,7 +24,7 @@ This review is based on static inspection of the repository. It is not a live pe
 ## Required before public launch
 
 ### Domain and deployment
-- Obtain IRNIC approval and confirm the domain is active.
+- IRNIC now lists `contentpilot.ir` as registered (expiry 2027-11-15); its DNS column still shows unavailable, so Cloudflare nameserver assignment and DNS activation remain pending.
 - Use only the exact nameservers Cloudflare assigns to this zone.
 - Keep the apex domain for the GitHub Pages frontend.
 - Configure the Worker only on `api.contentpilot.ir`.
@@ -80,7 +80,7 @@ This review is based on static inspection of the repository. It is not a live pe
 - A penetration test or independent security audit.
 
 ### Automated Worker boundary tests
-- Added 29 Node.js built-in tests for allowed apex/www CORS preflight, rejected unapproved origins, POST-only method enforcement, JSON content-type enforcement, declared and actual streamed-body size limits, malformed JSON rejection, fail-closed behavior without service bindings, transactional credit-debit/ledger SQL statements (including the no-credit case), registration with a mocked D1 binding but no Workers AI binding, free-quota reservation plus durable reservation insertion, paid-credit fallback after the daily limit, free/paid guarded generation refunds, one-time generation completion, duplicate-refund rejection, unknown-account login rejection, login rate limiting, successful login/session creation, logout token-hash deletion, authenticated `me`, and wrong-password rejection.
+- Added 31 Node.js built-in tests for allowed apex/www CORS preflight, rejected unapproved origins, POST-only method enforcement, JSON content-type enforcement, declared and actual streamed-body size limits, malformed JSON rejection, fail-closed behavior without service bindings, transactional credit-debit/ledger SQL statements (including the no-credit case), registration with a mocked D1 binding but no Workers AI binding, free-quota reservation plus durable reservation insertion, paid-credit fallback after the daily limit, free/paid guarded generation refunds, one-time generation completion, duplicate-refund rejection, unknown-account login rejection, login rate limiting, successful login/session creation, logout token-hash deletion, authenticated `me`, and wrong-password rejection.
 - The validation GitHub Actions workflow runs these tests after the static validator, which also checks keyboard skip navigation, localized account labels and accessible names for every form control.
 - These tests use mocked D1 and no live Cloudflare services. Registration verifies the Worker request path and SQL call sequence against a mock, not durable persistence. Credit tests inspect D1 batch statements and mocked result metadata; they do not prove live D1 transaction behavior, login persistence, full quota/refund concurrency, AI calls or production behavior. Generation reservation and refund tests inspect mocked SQL statements and mocked result metadata; they do not prove concurrent behavior or idempotent refunds against live D1. Authentication tests now exercise mocked successful login/session creation, logout token-hash deletion, authenticated `me`, wrong-password and unknown-account rejection, and rate limiting. These remain mocked tests and do not establish live D1 persistence or integration behavior. Account actions (register/login/logout/me) no longer require the Workers AI binding; only generation actions require it.
 
