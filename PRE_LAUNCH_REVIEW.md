@@ -1,0 +1,68 @@
+# ContentPilot pre-launch technical review
+
+This review is based on static inspection of the repository. It is not a live penetration test and does not prove that production services are healthy.
+
+## Confirmed in the repository
+
+- The frontend is a static single-page app; the Cloudflare Worker is a separate API.
+- The frontend stores its session bearer token in `sessionStorage`.
+- Passwords are derived with PBKDF2-SHA-256 and per-user random salts.
+- Session tokens are random values; only SHA-256 hashes are stored in D1.
+- Registration and login have per-IP and per-account rate limits.
+- Text and image generation require an authenticated session.
+- The Worker handles CORS preflight before its POST-only method guard.
+- Free usage and paid-credit reservations are enforced server-side.
+- Payment buttons are visibly inactive; the Worker has no payment/top-up endpoint.
+- Drafts and the content calendar are stored in browser `localStorage`, not synced to an account.
+
+## Required before public launch
+
+### Domain and deployment
+- Obtain IRNIC approval and confirm the domain is active.
+- Use only the exact nameservers Cloudflare assigns to this zone.
+- Keep the apex domain for the GitHub Pages frontend.
+- Configure the Worker only on `api.contentpilot.ir`.
+- Configure GitHub Pages DNS records and verify HTTPS.
+- Confirm both custom domains resolve before switching the frontend to production use.
+- Confirm GitHub Pages custom domain and HTTPS settings after the CNAME file is merged.
+
+### Functional verification
+- Test registration, login, logout and session expiry with a disposable test account.
+- Test the `me` endpoint and account quota display.
+- Test text generation in Persian and English, plus another supported language.
+- Test image generation and validate generated image downloads.
+- Confirm failed AI calls refund quota/credits correctly.
+- Test simultaneous requests at the free-quota boundary.
+- Test on current desktop and mobile browsers.
+
+### Account lifecycle and privacy
+- Implement email verification before treating email ownership as confirmed.
+- Implement a secure password-reset flow with expiring, single-use tokens.
+- Publish accurate privacy and retention terms, including the browser-local nature of drafts/calendar.
+- Provide a support contact and account/data deletion process.
+- Decide whether drafts and calendar should remain device-local or become account-synced.
+
+### Payments
+- Keep payments disabled.
+- Choose a supported payment provider.
+- Implement server-side signature verification, replay protection and idempotent credit fulfillment.
+- Test success, failure, cancellation, duplicate callbacks and refund paths before enabling purchases.
+
+### Operations
+- Confirm D1 backup/restore procedures.
+- Enable and review Worker logs/traces with appropriate privacy controls.
+- Add production monitoring and an incident contact.
+- Keep the Worker deployment workflow manual until a tested release process is agreed.
+- Run the repository validation workflow and confirm a green result before merging.
+
+## Not verified by this review
+
+- Live site availability, live DNS, nameserver activation or SSL issuance.
+- Production D1 schema integrity or backup status.
+- Actual AI model availability, latency, quotas or output quality.
+- End-to-end account flows or payment-provider behavior.
+- A penetration test or independent security audit.
+
+## Release gate
+
+Do not announce a public launch, enable payments, or treat the custom domain as operational until all required domain, functional, account-lifecycle and operational checks above have been completed.
