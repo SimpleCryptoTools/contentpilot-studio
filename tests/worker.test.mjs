@@ -302,3 +302,78 @@ test("refunds a failed paid generation with a transactional wallet and ledger ba
   assert.match(batches[0][1].sql, /AI generation refund/);
 });
 
+test("login rejects unknown accounts after applying hashed IP and email rate limits", async () => {
+  const rateKeys = [];
+  const db = {
+    prepare(sql) {
+      return {
+        sql,
+        bind(...args) {
+          return {
+            run: async () => ({ success: true }),
+            first: async () => {
+              if (sql.includes("INSERT INTO auth_rate_limits")) {
+                rateKeys.push({ key: args[0], raw: args });
+                return { attempts: 1 };
+              }
+              if (sql.includes("FROM users WHERE email")) return null;
+              throw new Error("Unexpected login query: " + sql);
+            }
+          };
+        }
+      };
+    }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json",
+      "CF-Connecting-IP": "192.0.2.20"
+    },
+    body: JSON.stringify({ action: "login", email: "missing@example.com", password: "wrong-password" })
+  }), { DB: db });
+
+  assert.equal(response.status, 401);
+  assert.equal(rateKeys.length, 2);
+  assert.ok(rateKeys.every(entry => !entry.key.includes("missing@example.com")));
+  assert.ok(rateKeys.every(entry => !entry.key.includes("192.0.2.20")));
+});
+
+test("login is rate limited when the account attempt threshold is exceeded", async () => {
+  const rateKeys = [];
+  const db = {
+    prepare(sql) {
+      return {
+        sql,
+        bind(...args) {
+          return {
+            run: async () => ({ success: true }),
+            first: async () => {
+              if (sql.includes("INSERT INTO auth_rate_limits")) {
+                rateKeys.push(args[0]);
+                return { attempts: String(args[0]).includes(":account:") ? 9 : 1 };
+              }
+              throw new Error("User lookup must not run after rate limiting");
+            }
+          };
+        }
+      };
+    }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json",
+      "CF-Connecting-IP": "192.0.2.21"
+    },
+    body: JSON.stringify({ action: "login", email: "limited@example.com", password: "wrong-password" })
+  }), { DB: db });
+
+  assert.equal(response.status, 429);
+  assert.equal(rateKeys.length, 2);
+  const payload = await response.json();
+  assert.match(payload.error, /۱۵ دقیقه/);
+});
+
