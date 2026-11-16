@@ -305,7 +305,7 @@ export async function reserveGeneration(db, userId) {
   return { type: "credit", userId };
 }
 
-async function refundGeneration(db, reservation) {
+export async function refundGeneration(db, reservation) {
   if (!reservation) return;
 
   if (reservation.type === "free") {
