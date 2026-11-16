@@ -75,6 +75,9 @@ for (const required of [
   'imageData: "data:" + imageMime',
   'Content-Length',
   '16 * 1024',
+  'readJsonBody(request, 16 * 1024)',
+  'request.body.getReader()',
+  'totalBytes > maxBytes',
   '415,'
 ]) {
   if (!worker.includes(required)) throw new Error("Missing Worker security/usage control: " + required);
