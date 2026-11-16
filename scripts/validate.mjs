@@ -71,4 +71,4 @@ for (const required of [
   if (!worker.includes(required)) throw new Error("Missing Worker security/usage control: " + required);
 }
 if (!html.includes('showToast(t("paymentInactive"))')) throw new Error("Payment UI must remain inactive until a verified payment flow is implemented");
-process.stdout.write("PASS API routing and baseline security guards\\n");
+process.stdout.write("PASS API routing and baseline security guards\n");
