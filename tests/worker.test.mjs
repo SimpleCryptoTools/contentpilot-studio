@@ -663,3 +663,72 @@ test("registration rejects a short password before touching D1", async () => {
   assert.equal(response.status, 400);
   assert.equal(databaseCalls, 0);
 });
+
+test("free generation duplicate refund does not decrement quota twice", async () => {
+  let batchCount = 0;
+  const db = {
+    prepare(sql) { return { sql, bind(...args) { return { sql, args }; } }; },
+    async batch(statements) {
+      batchCount++;
+      assert.equal(statements.length, 2);
+      return [{ meta: { changes: 0 } }, { meta: { changes: 0 } }];
+    }
+  };
+  const module = await import(workerModuleUrl);
+  const refunded = await module.refundGeneration(db, {
+    id: "already-refunded-free",
+    type: "free",
+    userId: "user-1",
+    date: "2026-11-16"
+  });
+  assert.equal(refunded, false);
+  assert.equal(batchCount, 1);
+});
+
+test("generation completion returns false when reservation is already finalized", async () => {
+  let executedSql = "";
+  const db = {
+    prepare(sql) {
+      return {
+        bind() {
+          return {
+            run: async () => {
+              executedSql = sql;
+              return { meta: { changes: 0 } };
+            }
+          };
+        }
+      };
+    }
+  };
+  const module = await import(workerModuleUrl);
+  const completed = await module.completeGeneration(db, {
+    id: "already-finalized",
+    userId: "user-1"
+  });
+  assert.equal(completed, false);
+  assert.match(executedSql, /status = 'reserved'/);
+});
+
+test("invalid generation reservation types cannot trigger a refund", async () => {
+  let databaseTouched = false;
+  const db = {
+    prepare() {
+      databaseTouched = true;
+      throw new Error("Database must not be touched for invalid reservation types");
+    },
+    async batch() {
+      databaseTouched = true;
+      throw new Error("Database must not be touched for invalid reservation types");
+    }
+  };
+  const module = await import(workerModuleUrl);
+  const refunded = await module.refundGeneration(db, {
+    id: "unknown-type",
+    type: "unknown",
+    userId: "user-1",
+    date: "2026-11-16"
+  });
+  assert.equal(refunded, false);
+  assert.equal(databaseTouched, false);
+});
