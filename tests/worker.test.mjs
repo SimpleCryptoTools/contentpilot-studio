@@ -241,9 +241,7 @@ test("reserves free quota and durable reservation in one D1 batch", async () => 
 test("free generation refund is guarded by durable reservation state", async () => {
   const batches = [];
   const db = {
-    prepare(sql) {
-      return { sql, bind(...args) { return { sql, args }; } };
-    },
+    prepare(sql) { return { sql, bind(...args) { return { sql, args }; } }; },
     async batch(statements) {
       batches.push(statements);
       return [{ success: true, meta: { changes: 1 } }, { success: true, meta: { changes: 1 } }];
@@ -256,18 +254,17 @@ test("free generation refund is guarded by durable reservation state", async () 
   assert.equal(refunded, true);
   assert.equal(batches.length, 1);
   assert.equal(batches[0].length, 2);
-  assert.match(batches[0][0].sql, /UPDATE generation_reservations/);
-  assert.match(batches[0][0].sql, /status = 'refunded'/);
-  assert.match(batches[0][0].sql, /status = 'reserved'/);
-  assert.match(batches[0][1].sql, /UPDATE usage_daily/);
+  assert.match(batches[0][0].sql, /UPDATE usage_daily/);
+  assert.match(batches[0][0].sql, /EXISTS \\(/);
+  assert.match(batches[0][1].sql, /UPDATE generation_reservations/);
+  assert.match(batches[0][1].sql, /status = 'refunded'/);
+  assert.match(batches[0][1].sql, /status = 'reserved'/);
   assert.ok(batches[0][1].sql.includes("changes() = 1"));
 });
 test("paid generation refund is guarded and credits wallet plus ledger transactionally", async () => {
   const batches = [];
   const db = {
-    prepare(sql) {
-      return { sql, bind(...args) { return { sql, args }; } };
-    },
+    prepare(sql) { return { sql, bind(...args) { return { sql, args }; } }; },
     async batch(statements) {
       batches.push(statements);
       return statements.map(() => ({ success: true, meta: { changes: 1 } }));
@@ -280,10 +277,11 @@ test("paid generation refund is guarded and credits wallet plus ledger transacti
   assert.equal(refunded, true);
   assert.equal(batches.length, 1);
   assert.equal(batches[0].length, 3);
-  assert.match(batches[0][0].sql, /UPDATE generation_reservations/);
-  assert.match(batches[0][0].sql, /status = 'refunded'/);
-  assert.match(batches[0][1].sql, /UPDATE wallets/);
-  assert.ok(batches[0][1].sql.includes("credits = credits + 1"));
+  assert.match(batches[0][0].sql, /UPDATE wallets/);
+  assert.ok(batches[0][0].sql.includes("credits = credits + 1"));
+  assert.match(batches[0][0].sql, /EXISTS \\(/);
+  assert.match(batches[0][1].sql, /UPDATE generation_reservations/);
+  assert.match(batches[0][1].sql, /status = 'refunded'/);
   assert.ok(batches[0][1].sql.includes("changes() = 1"));
   assert.match(batches[0][2].sql, /INSERT INTO credit_ledger/);
   assert.ok(batches[0][2].sql.includes("WHERE changes() = 1"));
