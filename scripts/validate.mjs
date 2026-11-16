@@ -125,6 +125,11 @@ for (const required of [
   "CREATE TABLE IF NOT EXISTS generation_reservations",
   "reservation_type IN ('free', 'credit')",
   "status IN ('reserved', 'consumed', 'refunded')",
+  "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+  "idx_generation_reservations_user_status",
+  "idx_generation_reservations_created_at",
+  "created_at INTEGER NOT NULL",
+  "updated_at INTEGER NOT NULL",
   "PRIMARY KEY"
 ]) {
   if (!reservationMigration.includes(required)) {
