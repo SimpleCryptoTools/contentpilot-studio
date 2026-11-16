@@ -223,3 +223,82 @@ test("registration works without a Workers AI binding", async () => {
   assert.equal(batchStatements.length, 1);
   assert.equal(batchStatements[0].length, 3);
 });
+
+test("reserves a free generation before falling back to paid credits", async () => {
+  const prepared = [];
+  let batchCalls = 0;
+  const db = {
+    prepare(sql) {
+      return {
+        sql,
+        bind(...args) {
+          prepared.push({ sql, args });
+          return { first: async () => ({ count: 2 }), sql, args };
+        }
+      };
+    },
+    async batch() {
+      batchCalls++;
+      throw new Error("paid-credit batch must not run for a free reservation");
+    }
+  };
+
+  const module = await import(workerModuleUrl);
+  const reservation = await module.reserveGeneration(db, "free-user");
+  assert.equal(reservation.type, "free");
+  assert.equal(reservation.userId, "free-user");
+  assert.match(reservation.date, /^\\d{4}-\\d{2}-\\d{2}$/);
+  assert.equal(batchCalls, 0);
+  assert.match(prepared[0].sql, /ON CONFLICT\\(user_id, action, usage_date\\)/);
+  assert.match(prepared[0].sql, /usage_daily.count < \?/);
+  assert.deepEqual(prepared[0].args.slice(0, 1), ["free-user"]);
+});
+
+test("refunds a failed free generation by decrementing its daily reservation", async () => {
+  const calls = [];
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...args) {
+          return {
+            run: async () => { calls.push({ sql, args }); return { success: true }; }
+          };
+        }
+      };
+    }
+  };
+  const module = await import(workerModuleUrl);
+  await module.refundGeneration(db, {
+    type: "free", userId: "free-user", date: "2026-11-16"
+  });
+
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].sql, /UPDATE usage_daily/);
+  assert.match(calls[0].sql, /count = CASE WHEN count > 0 THEN count - 1 ELSE 0 END/);
+  assert.deepEqual(calls[0].args, ["free-user", "2026-11-16"]);
+});
+
+test("refunds a failed paid generation with a transactional wallet and ledger batch", async () => {
+  const batches = [];
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...args) { return { sql, args }; }
+      };
+    },
+    async batch(statements) {
+      batches.push(statements);
+      return statements.map(() => ({ success: true, meta: { changes: 1 } }));
+    }
+  };
+  const module = await import(workerModuleUrl);
+  await module.refundGeneration(db, { type: "credit", userId: "paid-user" });
+
+  assert.equal(batches.length, 1);
+  assert.equal(batches[0].length, 2);
+  assert.match(batches[0][0].sql, /UPDATE wallets/);
+  assert.match(batches[0][0].sql, /credits = credits \\+ 1/);
+  assert.match(batches[0][1].sql, /INSERT INTO credit_ledger/);
+  assert.match(batches[0][1].sql, /AI generation refund/);
+});
+
