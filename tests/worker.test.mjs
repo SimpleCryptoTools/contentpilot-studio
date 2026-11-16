@@ -234,9 +234,9 @@ test("reserves free quota and durable reservation in one D1 batch", async () => 
   assert.equal(batches.length, 1);
   assert.equal(batches[0].length, 2);
   assert.match(batches[0][0].sql, /INSERT INTO usage_daily/);
-  assert.match(batches[0][0].sql, /usage_daily.count < \\?/);
+  assert.ok(batches[0][0].sql.includes("usage_daily.count < ?"));
   assert.match(batches[0][1].sql, /INSERT INTO generation_reservations/);
-  assert.match(batches[0][1].sql, /WHERE changes\\(\\) = 1/);
+  assert.ok(batches[0][1].sql.includes("WHERE changes() = 1"));
 });
 test("free generation refund is guarded by durable reservation state", async () => {
   const batches = [];
