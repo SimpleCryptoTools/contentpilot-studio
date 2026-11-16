@@ -225,22 +225,15 @@ test("registration works without a Workers AI binding", async () => {
   assert.equal(batchStatements[0].length, 3);
 });
 
-test("reserves a free generation before falling back to paid credits", async () => {
-  const prepared = [];
-  let batchCalls = 0;
+test("reserves free quota and durable reservation in one D1 batch", async () => {
+  const batches = [];
   const db = {
     prepare(sql) {
-      return {
-        sql,
-        bind(...args) {
-          prepared.push({ sql, args });
-          return { first: async () => ({ count: 2 }), sql, args };
-        }
-      };
+      return { sql, bind(...args) { return { sql, args }; } };
     },
-    async batch() {
-      batchCalls++;
-      throw new Error("paid-credit batch must not run for a free reservation");
+    async batch(statements) {
+      batches.push(statements);
+      return [{ success: true, meta: { changes: 1 } }, { success: true, meta: { changes: 1 } }];
     }
   };
 
@@ -248,44 +241,45 @@ test("reserves a free generation before falling back to paid credits", async () 
   const reservation = await module.reserveGeneration(db, "free-user");
   assert.equal(reservation.type, "free");
   assert.equal(reservation.userId, "free-user");
-  assert.match(reservation.date, /^\d{4}-\d{2}-\d{2}$/);
-  assert.equal(batchCalls, 0);
-  assert.match(prepared[0].sql, /ON CONFLICT\(user_id, action, usage_date\)/);
-  assert.match(prepared[0].sql, /usage_daily.count < \?/);
-  assert.deepEqual(prepared[0].args.slice(0, 1), ["free-user"]);
+  assert.match(reservation.date, /^\\d{4}-\\d{2}-\\d{2}$/);
+  assert.equal(typeof reservation.id, "string");
+  assert.equal(reservation.id.length, 36);
+  assert.equal(batches.length, 1);
+  assert.equal(batches[0].length, 2);
+  assert.match(batches[0][0].sql, /INSERT INTO usage_daily/);
+  assert.match(batches[0][0].sql, /usage_daily.count < \\?/);
+  assert.match(batches[0][1].sql, /INSERT INTO generation_reservations/);
+  assert.match(batches[0][1].sql, /WHERE changes\\(\\) = 1/);
 });
-
-test("refunds a failed free generation by decrementing its daily reservation", async () => {
-  const calls = [];
-  const db = {
-    prepare(sql) {
-      return {
-        bind(...args) {
-          return {
-            run: async () => { calls.push({ sql, args }); return { success: true }; }
-          };
-        }
-      };
-    }
-  };
-  const module = await import(workerModuleUrl);
-  await module.refundGeneration(db, {
-    type: "free", userId: "free-user", date: "2026-11-16"
-  });
-
-  assert.equal(calls.length, 1);
-  assert.match(calls[0].sql, /UPDATE usage_daily/);
-  assert.match(calls[0].sql, /count = CASE WHEN count > 0 THEN count - 1 ELSE 0 END/);
-  assert.deepEqual(calls[0].args, ["free-user", "2026-11-16"]);
-});
-
-test("refunds a failed paid generation with a transactional wallet and ledger batch", async () => {
+test("free generation refund is guarded by durable reservation state", async () => {
   const batches = [];
   const db = {
     prepare(sql) {
-      return {
-        bind(...args) { return { sql, args }; }
-      };
+      return { sql, bind(...args) { return { sql, args }; } };
+    },
+    async batch(statements) {
+      batches.push(statements);
+      return [{ success: true, meta: { changes: 1 } }, { success: true, meta: { changes: 1 } }];
+    }
+  };
+  const module = await import(workerModuleUrl);
+  const reservation = { id: "reservation-free", type: "free", userId: "free-user", date: "2026-11-16" };
+  const refunded = await module.refundGeneration(db, reservation);
+
+  assert.equal(refunded, true);
+  assert.equal(batches.length, 1);
+  assert.equal(batches[0].length, 2);
+  assert.match(batches[0][0].sql, /UPDATE generation_reservations/);
+  assert.match(batches[0][0].sql, /status = 'refunded'/);
+  assert.match(batches[0][0].sql, /status = 'reserved'/);
+  assert.match(batches[0][1].sql, /UPDATE usage_daily/);
+  assert.match(batches[0][1].sql, /changes\\(\\) = 1/);
+});
+test("paid generation refund is guarded and credits wallet plus ledger transactionally", async () => {
+  const batches = [];
+  const db = {
+    prepare(sql) {
+      return { sql, bind(...args) { return { sql, args }; } };
     },
     async batch(statements) {
       batches.push(statements);
@@ -293,14 +287,51 @@ test("refunds a failed paid generation with a transactional wallet and ledger ba
     }
   };
   const module = await import(workerModuleUrl);
-  await module.refundGeneration(db, { type: "credit", userId: "paid-user" });
+  const reservation = { id: "reservation-paid", type: "credit", userId: "paid-user", date: "2026-11-16" };
+  const refunded = await module.refundGeneration(db, reservation);
 
+  assert.equal(refunded, true);
   assert.equal(batches.length, 1);
-  assert.equal(batches[0].length, 2);
-  assert.match(batches[0][0].sql, /UPDATE wallets/);
-  assert.match(batches[0][0].sql, /credits = credits \+ 1/);
-  assert.match(batches[0][1].sql, /INSERT INTO credit_ledger/);
-  assert.match(batches[0][1].sql, /AI generation refund/);
+  assert.equal(batches[0].length, 3);
+  assert.match(batches[0][0].sql, /UPDATE generation_reservations/);
+  assert.match(batches[0][0].sql, /status = 'refunded'/);
+  assert.match(batches[0][1].sql, /UPDATE wallets/);
+  assert.match(batches[0][1].sql, /credits = credits \\+ 1/);
+  assert.match(batches[0][1].sql, /changes\\(\\) = 1/);
+  assert.match(batches[0][2].sql, /INSERT INTO credit_ledger/);
+  assert.match(batches[0][2].sql, /WHERE changes\\(\\) = 1/);
+});
+test("generation completion only transitions an active reservation once", async () => {
+  const calls = [];
+  const db = {
+    prepare(sql) {
+      return { bind(...args) { return { run: async () => { calls.push({sql,args}); return { meta: { changes: 1 } }; } }; } };
+    }
+  };
+  const module = await import(workerModuleUrl);
+  const done = await module.completeGeneration(db, { id: "reservation-1", userId: "user-1" });
+  assert.equal(done, true);
+  assert.match(calls[0].sql, /status = 'consumed'/);
+  assert.match(calls[0].sql, /status = 'reserved'/);
+});
+
+test("duplicate generation refund does not apply when reservation is no longer active", async () => {
+  const db = {
+    prepare(sql) { return { sql, bind(...args) { return { sql, args }; } }; },
+    async batch(statements) {
+      assert.equal(statements.length, 3);
+      return [
+        { meta: { changes: 0 } },
+        { meta: { changes: 0 } },
+        { meta: { changes: 0 } }
+      ];
+    }
+  };
+  const module = await import(workerModuleUrl);
+  const refunded = await module.refundGeneration(db, {
+    id: "already-refunded", type: "credit", userId: "user-1", date: "2026-11-16"
+  });
+  assert.equal(refunded, false);
 });
 
 test("login rejects unknown accounts after applying hashed IP and email rate limits", async () => {
@@ -564,31 +595,35 @@ test("login rejects a wrong password without creating a session", async () => {
 });
 
 
-test("falls back to one paid credit after the third free generation is already reserved", async () => {
-  const statements = [];
+test("falls back to a paid credit with a durable reservation when free quota is exhausted", async () => {
+  const batches = [];
   const db = {
     prepare(sql) {
-      return {
-        sql,
-        bind(...args) { return { sql, args, first: async () => null }; }
-      };
+      return { sql, bind(...args) { return { sql, args }; } };
     },
-    async batch(batchStatements) {
-      statements.push(batchStatements);
-      return [{ success: true, meta: { changes: 1 } }, { success: true, meta: { changes: 1 } }];
+    async batch(statements) {
+      batches.push(statements);
+      if (batches.length === 1) return [{ success: true, meta: { changes: 0 } }, { success: true, meta: { changes: 0 } }];
+      return [
+        { success: true, meta: { changes: 1 } },
+        { success: true, meta: { changes: 1 } },
+        { success: true, meta: { changes: 1 } }
+      ];
     }
   };
   const module = await import(workerModuleUrl);
   const reservation = await module.reserveGeneration(db, "quota-user");
 
-  assert.deepEqual(reservation, { type: "credit", userId: "quota-user" });
-  assert.equal(statements.length, 1);
-  assert.equal(statements[0].length, 2);
-  assert.match(statements[0][0].sql, /UPDATE wallets/);
-  assert.match(statements[0][0].sql, /credits > 0/);
-  assert.match(statements[0][1].sql, /INSERT INTO credit_ledger/);
+  assert.equal(reservation.type, "credit");
+  assert.equal(reservation.userId, "quota-user");
+  assert.equal(typeof reservation.id, "string");
+  assert.equal(batches.length, 2);
+  assert.equal(batches[0].length, 2);
+  assert.equal(batches[1].length, 3);
+  assert.match(batches[1][0].sql, /UPDATE wallets/);
+  assert.match(batches[1][1].sql, /INSERT INTO credit_ledger/);
+  assert.match(batches[1][2].sql, /INSERT INTO generation_reservations/);
 });
-
 test("registration rejects an existing email without creating a second account", async () => {
   let registrationBatches = 0;
   const db = {
