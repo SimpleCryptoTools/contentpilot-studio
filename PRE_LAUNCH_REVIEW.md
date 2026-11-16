@@ -48,7 +48,7 @@ This review is based on static inspection of the repository. It is not a live pe
 - Implement a secure password-reset flow with expiring, single-use tokens.
 - Review and complete `PRIVACY_NOTICE_DRAFT.md`; it is an evidence-based draft, not a published legal policy.
 - Publish accurate privacy and retention terms, including the browser-local nature of drafts/calendar.
-- Provide a support contact and account/data deletion process.
+- Provide a support contact and account/data deletion process. See ACCOUNT_DATA_LIFECYCLE.md for the current table/storage inventory and the explicit schema/financial-retention blockers; do not expose destructive deletion until they are resolved.
 - Decide whether drafts and calendar should remain device-local or become account-synced.
 
 ### Payments
