@@ -308,6 +308,7 @@ test("login rejects unknown accounts after applying hashed IP and email rate lim
     prepare(sql) {
       return {
         sql,
+        run: async () => ({ success: true }),
         bind(...args) {
           return {
             run: async () => ({ success: true }),
@@ -346,6 +347,7 @@ test("login is rate limited when the account attempt threshold is exceeded", asy
     prepare(sql) {
       return {
         sql,
+        run: async () => ({ success: true }),
         bind(...args) {
           return {
             run: async () => ({ success: true }),
