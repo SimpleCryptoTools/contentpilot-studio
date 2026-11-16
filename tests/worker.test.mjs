@@ -167,3 +167,59 @@ test("does not create a credit reservation when the wallet debit changes no row"
   );
   assert.equal(batchCalls, 1);
 });
+
+
+test("registration works without a Workers AI binding", async () => {
+  const batchStatements = [];
+  const db = {
+    prepare(sql) {
+      return {
+        sql,
+        args: [],
+        bind(...args) {
+          this.args = args;
+          return this;
+        },
+        async run() {
+          return { success: true, meta: { changes: 1 } };
+        },
+        async first() {
+          if (this.sql.includes("INSERT INTO auth_rate_limits")) {
+            return { attempts: 1 };
+          }
+          if (this.sql.includes("SELECT id FROM users")) return null;
+          if (this.sql.includes("SELECT credits FROM wallets")) return { credits: 0 };
+          if (this.sql.includes("SELECT count FROM usage_daily")) return null;
+          throw new Error("Unexpected D1 query in registration test: " + this.sql);
+        }
+      };
+    },
+    async batch(statements) {
+      batchStatements.push(statements);
+      return statements.map(() => ({ success: true, meta: { changes: 1 } }));
+    }
+  };
+
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json",
+      "CF-Connecting-IP": "192.0.2.10"
+    },
+    body: JSON.stringify({
+      action: "register",
+      email: "new-user@example.com",
+      password: "correct-horse-battery"
+    })
+  }), { DB: db });
+
+  assert.equal(response.status, 201);
+  const payload = await response.json();
+  assert.equal(payload.ok, true);
+  assert.equal(payload.user.email, "new-user@example.com");
+  assert.equal(typeof payload.accessToken, "string");
+  assert.equal(payload.accessToken.length, 64);
+  assert.equal(batchStatements.length, 1);
+  assert.equal(batchStatements[0].length, 3);
+});
