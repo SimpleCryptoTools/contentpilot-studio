@@ -70,7 +70,12 @@ for (const required of [
   'https://contentpilot.ir',
   'https://www.contentpilot.ir',
   '"Vary": "Origin"',
-  'if (!originAllowed)'
+  'if (!originAllowed)',
+  'detectImageMime(imageResult.image)',
+  'imageData: "data:" + imageMime',
+  'Content-Length',
+  '16 * 1024',
+  '415,'
 ]) {
   if (!worker.includes(required)) throw new Error("Missing Worker security/usage control: " + required);
 }
@@ -78,4 +83,4 @@ if (worker.includes('"Access-Control-Allow-Origin": "*"')) {
   throw new Error("Worker CORS must not allow every browser origin");
 }
 if (!html.includes('showToast(t("paymentInactive"))')) throw new Error("Payment UI must remain inactive until a verified payment flow is implemented");
-process.stdout.write("PASS API routing, origin allowlist and baseline security guards\n");
+process.stdout.write("PASS API routing, origin allowlist, request bounds and image MIME validation\n");
