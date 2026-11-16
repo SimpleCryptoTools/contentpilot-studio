@@ -8,12 +8,13 @@ This review is based on static inspection of the repository. It is not a live pe
 - The frontend stores its session bearer token in `sessionStorage`.
 - Passwords are derived with PBKDF2-SHA-256 and per-user random salts.
 - Session tokens are random values; only SHA-256 hashes are stored in D1.
-- Registration and login have per-IP and per-account rate limits.
+- Registration and login have per-IP and per-account rate limits. Their hashed counters are provisioned by `migrations/0002_auth_rate_limits.sql`; request handlers no longer run schema DDL.
 - Text and image generation require an authenticated session.
 - The Worker handles CORS preflight before its POST-only method guard.
 - The Worker validates JSON request bodies before checking service bindings, requires POST, and enforces a 16 KiB limit while reading the actual request stream; it also rejects requests whose declared Content-Length exceeds the limit before reading.
 - Generated image responses identify PNG/JPEG/WebP from the returned byte signature rather than assuming JPEG.
 - Browser CORS is restricted to the intended apex and www frontend origins; CORS is not treated as authentication.
+- Authentication rate-limit storage is managed by `migrations/0002_auth_rate_limits.sql`, including an index for periodic expiry cleanup; this migration has not been applied to production D1.
 - Free and paid generation reservations now create durable `generation_reservations` rows in the same D1 batch as quota reservation or wallet debit; completion and refund use conditional state transitions so only a still-reserved operation can be finalized or refunded. A migration is committed, but it has not been applied to the production D1 database or verified with live D1 concurrency tests.
 - Payment buttons are visibly inactive; the Worker has no payment/top-up endpoint.
 - Drafts and the content calendar are stored in browser `localStorage`, not synced to an account.
@@ -69,7 +70,7 @@ This review is based on static inspection of the repository. It is not a live pe
 - The document now declares `strict-origin-when-cross-origin` as its referrer policy.
 - GitHub Pages does not provide repository-controlled arbitrary HTTP response headers through a static HTML file. A meta tag cannot replace response headers such as Content-Security-Policy, frame-ancestors, X-Content-Type-Options, Permissions-Policy or HSTS. Configure and verify these at a suitable CDN/edge layer after the domain is approved; do not claim they are active yet.
 - The bearer token remains accessible to same-origin JavaScript because it is held in `sessionStorage`. Moving it to an HttpOnly cookie requires a deliberate CSRF/CORS/session architecture change and should not be improvised in this readiness PR.
-- Generation refunds now use a durable per-reservation ID and conditional `reserved` → `refunded` transition. Successful generation changes the state to `consumed`. The migration is `migrations/0001_generation_reservations.sql`; it must be applied to the correct D1 database before deploying this Worker. The new tests inspect the state-transition SQL and mocked D1 results only. Live D1 semantics, concurrent duplicate refunds, crash recovery and backup/restore remain unverified, so keep purchases disabled until those checks pass.
+- Generation refunds now use a durable per-reservation ID and conditional `reserved` → `refunded` transition. Successful generation changes the state to `consumed`. The migrations are `migrations/0001_generation_reservations.sql` and `migrations/0002_auth_rate_limits.sql`; both must be applied to the correct D1 database before deploying this Worker. The new tests inspect the state-transition SQL and mocked D1 results only. Live D1 semantics, concurrent duplicate refunds, crash recovery and backup/restore remain unverified, so keep purchases disabled until those checks pass.
 ## Not verified by this review
 
 - Live site availability, live DNS, nameserver activation or SSL issuance.
