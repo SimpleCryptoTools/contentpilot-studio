@@ -77,6 +77,30 @@ async function derivePasswordHash(password, saltHex) {
     .join("");
 }
 
+function detectImageMime(base64) {
+  // Decode only a short prefix to identify the actual image format without
+  // allocating a second full-size copy of the generated image.
+  let prefix;
+  try {
+    prefix = atob(base64.slice(0, 32));
+  } catch (_) {
+    return null;
+  }
+  const byte = index => prefix.charCodeAt(index);
+  const isPng = prefix.length >= 8 &&
+    byte(0) === 0x89 && byte(1) === 0x50 && byte(2) === 0x4e &&
+    byte(3) === 0x47 && byte(4) === 0x0d && byte(5) === 0x0a &&
+    byte(6) === 0x1a && byte(7) === 0x0a;
+  const isJpeg = prefix.length >= 3 &&
+    byte(0) === 0xff && byte(1) === 0xd8 && byte(2) === 0xff;
+  const isWebp = prefix.length >= 12 &&
+    prefix.slice(0, 4) === "RIFF" && prefix.slice(8, 12) === "WEBP";
+  if (isPng) return "image/png";
+  if (isJpeg) return "image/jpeg";
+  if (isWebp) return "image/webp";
+  return null;
+}
+
 function constantTimeEqual(a, b) {
   if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) {
     return false;
@@ -339,6 +363,23 @@ export default {
       );
     }
 
+    const contentType = request.headers.get("Content-Type") || "";
+    if (!/^application\/json(?:\s*;|$)/i.test(contentType)) {
+      return jsonResponse(
+        { error: "نوع محتوای درخواست باید JSON باشد." },
+        415,
+        corsHeaders
+      );
+    }
+    const declaredLength = Number(request.headers.get("Content-Length") || 0);
+    if (declaredLength > 16 * 1024) {
+      return jsonResponse(
+        { error: "حجم درخواست بیش از حد مجاز است." },
+        413,
+        corsHeaders
+      );
+    }
+
     if (!env.DB || !env.AI) {
       return jsonResponse(
         { error: "اتصال دیتابیس یا هوش مصنوعی تنظیم نشده است." },
@@ -519,11 +560,15 @@ Create only the visual image.
         if (!imageResult || typeof imageResult.image !== "string" || !imageResult.image) {
           throw new Error("Image model returned no image.");
         }
+        const imageMime = detectImageMime(imageResult.image);
+        if (!imageMime) {
+          throw new Error("Image model returned an unsupported or invalid image format.");
+        }
 
         const usage = await getUsageSnapshot(env.DB, currentUser.id);
         reservation = null;
         return jsonResponse({
-          imageData: "data:image/jpeg;base64," + imageResult.image,
+          imageData: "data:" + imageMime + ";base64," + imageResult.image,
           imageType,
           usage
         }, 200, corsHeaders);
