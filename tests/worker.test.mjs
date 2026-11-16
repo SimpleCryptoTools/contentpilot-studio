@@ -70,3 +70,30 @@ test("rejects requests declaring a body larger than 16 KiB", async () => {
   });
   assert.equal(response.status, 413);
 });
+
+test("rejects an oversized streamed body even without Content-Length", async () => {
+  const oversizedJson = JSON.stringify({ payload: "x".repeat(16 * 1024) });
+  const request = new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json"
+    },
+    body: oversizedJson
+  });
+  assert.equal(request.headers.get("Content-Length"), null);
+  const response = await worker.fetch(request, env);
+  assert.equal(response.status, 413);
+});
+
+test("returns a client error for malformed JSON", async () => {
+  const response = await call("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json"
+    },
+    body: "{invalid"
+  });
+  assert.equal(response.status, 400);
+});
