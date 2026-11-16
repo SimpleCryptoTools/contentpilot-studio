@@ -11,6 +11,7 @@ This review is based on static inspection of the repository. It is not a live pe
 - Registration and login have per-IP and per-account rate limits.
 - Text and image generation require an authenticated session.
 - The Worker handles CORS preflight before its POST-only method guard.
+- Browser CORS is restricted to the intended apex and www frontend origins; CORS is not treated as authentication.
 - Free usage and paid-credit reservations are enforced server-side.
 - Payment buttons are visibly inactive; the Worker has no payment/top-up endpoint.
 - Drafts and the content calendar are stored in browser `localStorage`, not synced to an account.
@@ -34,10 +35,12 @@ This review is based on static inspection of the repository. It is not a live pe
 - Confirm failed AI calls refund quota/credits correctly.
 - Test simultaneous requests at the free-quota boundary.
 - Test on current desktop and mobile browsers.
+- Verify allowed-origin preflight and rejection of an unapproved browser Origin after the Worker custom domain is configured.
 
 ### Account lifecycle and privacy
 - Implement email verification before treating email ownership as confirmed.
 - Implement a secure password-reset flow with expiring, single-use tokens.
+- Review and complete `PRIVACY_NOTICE_DRAFT.md`; it is an evidence-based draft, not a published legal policy.
 - Publish accurate privacy and retention terms, including the browser-local nature of drafts/calendar.
 - Provide a support contact and account/data deletion process.
 - Decide whether drafts and calendar should remain device-local or become account-synced.
