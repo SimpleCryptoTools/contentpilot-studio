@@ -176,6 +176,7 @@ test("registration works without a Workers AI binding", async () => {
       return {
         sql,
         args: [],
+        async run() { return { success: true, meta: { changes: 1 } }; },
         bind(...args) {
           this.args = args;
           return this;
@@ -531,6 +532,7 @@ test("login rejects a wrong password without creating a session", async () => {
   const db = {
     prepare(sql) {
       return {
+        run: async () => ({ success: true }),
         bind() {
           return {
             run: async () => ({ success: true }),
