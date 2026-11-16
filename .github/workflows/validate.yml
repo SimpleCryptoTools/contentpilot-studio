@@ -23,3 +23,5 @@ jobs:
         run: node scripts/validate.mjs
       - name: Run Worker request-boundary tests
         run: node --test tests/worker.test.mjs
+      - name: Test D1 migration SQL with SQLite
+        run: python3 tests/migrations.test.py
