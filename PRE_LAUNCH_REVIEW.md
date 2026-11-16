@@ -70,9 +70,9 @@ This review is based on static inspection of the repository. It is not a live pe
 - A penetration test or independent security audit.
 
 ### Automated Worker boundary tests
-- Added Node.js built-in tests for allowed apex/www CORS preflight, rejected unapproved origins, POST-only method enforcement, JSON content-type enforcement, declared and actual streamed-body size limits, malformed JSON rejection, fail-closed behavior without service bindings, transactional credit-debit/ledger SQL statements (including the no-credit case), and registration with a mocked D1 binding but no Workers AI binding.
+- Added Node.js built-in tests for allowed apex/www CORS preflight, rejected unapproved origins, POST-only method enforcement, JSON content-type enforcement, declared and actual streamed-body size limits, malformed JSON rejection, fail-closed behavior without service bindings, transactional credit-debit/ledger SQL statements (including the no-credit case), registration with a mocked D1 binding but no Workers AI binding, free-quota reservation selection, and free/paid generation refund SQL paths.
 - The validation GitHub Actions workflow now runs these tests after the static validator.
-- These tests use mocked D1 and no live Cloudflare services. Registration verifies the Worker request path and SQL call sequence against a mock, not durable persistence. Credit tests inspect D1 batch statements and mocked result metadata; they do not prove live D1 transaction behavior, login persistence, full quota/refund concurrency, AI calls or production behavior. Account actions (register/login/logout/me) no longer require the Workers AI binding; only generation actions require it.
+- These tests use mocked D1 and no live Cloudflare services. Registration verifies the Worker request path and SQL call sequence against a mock, not durable persistence. Credit tests inspect D1 batch statements and mocked result metadata; they do not prove live D1 transaction behavior, login persistence, full quota/refund concurrency, AI calls or production behavior. Free reservation and refund tests also inspect mocked SQL calls; they do not prove concurrent behavior or idempotent refunds against live D1. Account actions (register/login/logout/me) no longer require the Workers AI binding; only generation actions require it.
 
 ## Release gate
 
