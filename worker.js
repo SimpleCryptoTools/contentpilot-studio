@@ -39,6 +39,41 @@ function httpError(status, message) {
   return error;
 }
 
+async function readJsonBody(request, maxBytes) {
+  if (!request.body) throw httpError(400, "بدنه درخواست خالی است.");
+  const reader = request.body.getReader();
+  const chunks = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        await reader.cancel();
+        throw httpError(413, "حجم درخواست بیش از حد مجاز است.");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bodyBytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bodyBytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  try {
+    return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bodyBytes));
+  } catch (_) {
+    throw httpError(400, "ساختار JSON درخواست معتبر نیست.");
+  }
+}
+
 function randomHex(byteLength) {
   const bytes = crypto.getRandomValues(new Uint8Array(byteLength || 32));
   return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
@@ -392,7 +427,7 @@ export default {
     let userForRefund = null;
 
     try {
-      const body = await request.json();
+      const body = await readJsonBody(request, 16 * 1024);
       if (!body || typeof body !== "object" || Array.isArray(body)) {
         throw httpError(400, "اطلاعات ارسالی معتبر نیست.");
       }
