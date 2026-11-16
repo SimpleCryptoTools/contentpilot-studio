@@ -188,7 +188,7 @@ async function bumpRateLimit(db, rateKey, maxAttempts, windowSeconds) {
   return Number(row?.attempts || 0) <= maxAttempts;
 }
 
-async function enforceAuthRateLimit(db, request, email, action) {
+export async function enforceAuthRateLimit(db, request, email, action) {
   await ensureAuthRateLimitTable(db);
 
   const ip = request.headers.get("CF-Connecting-IP") || "unknown-client";
