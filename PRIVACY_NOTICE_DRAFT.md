@@ -42,3 +42,7 @@
 5. Decide whether email verification and password reset will be provided, then implement and test them before promising these features.
 6. Have the notice reviewed for the countries in which the service will operate.
 
+
+
+## Decision recorded for this release
+Drafts and calendar remain browser-local. They are not account-synced. Clearing browser/site data may permanently remove them. This notice remains a draft until the operator/contact, deployed providers, retention and applicable legal review are completed.
