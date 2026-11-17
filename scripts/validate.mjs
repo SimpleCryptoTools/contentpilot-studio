@@ -41,6 +41,22 @@ if (!html.includes('<meta name="referrer" content="strict-origin-when-cross-orig
   throw new Error("Frontend must use a restrictive cross-origin referrer policy");
 }
 
+const lifecycle = readFileSync("ACCOUNT_DATA_LIFECYCLE.md", "utf8");
+const privacy = readFileSync("PRIVACY_NOTICE_DRAFT.md", "utf8");
+const tracker = readFileSync("COMPLETION_TRACKER_30.md", "utf8");
+for (const [label, source] of [
+  ["account lifecycle", lifecycle],
+  ["privacy notice", privacy],
+  ["completion tracker", tracker]
+]) {
+  if (!source.includes("browser-local")) {
+    throw new Error(label + " must document the browser-local drafts/calendar decision");
+  }
+}
+if (!tracker.includes("- [x] 26.")) {
+  throw new Error("Completion tracker must record the documented browser-local storage decision");
+}
+
 for (const requiredHeader of [
   '"X-Content-Type-Options": "nosniff"',
   '"X-Frame-Options": "DENY"',
