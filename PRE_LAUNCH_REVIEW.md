@@ -49,7 +49,7 @@ This review is based on static inspection of the repository. It is not a live pe
 - Review and complete `PRIVACY_NOTICE_DRAFT.md`; it is an evidence-based draft, not a published legal policy.
 - Publish accurate privacy and retention terms, including the browser-local nature of drafts/calendar.
 - Provide a support contact and account/data deletion process. See ACCOUNT_DATA_LIFECYCLE.md for the current table/storage inventory and the explicit schema/financial-retention blockers; do not expose destructive deletion until they are resolved.
-- Decide whether drafts and calendar should remain device-local or become account-synced.
+- Product decision for this release: drafts and calendar remain browser-local and are not account-synced; clearing browser/site data may permanently remove them. Revisit sync only as a separate product decision.
 
 ### Payments
 - Keep payments disabled.
@@ -98,3 +98,8 @@ Do not announce a public launch, enable payments, or treat the custom domain as 
 - Frontend edge-header specification: see `FRONTEND_EDGE_SECURITY_HEADERS.md`. GitHub Pages does not receive arbitrary response headers from repository files; no edge policy is active.
 - Manual browser/device QA matrix: see `BROWSER_QA_CHECKLIST.md`. No browser/device execution or independent audit is claimed.
 - Worker tests now also reject malformed registration email and empty login email before touching D1; they remain local mocked request-boundary tests.
+
+
+### Additional repository-only security checks
+- Login now rejects malformed or oversized email addresses before performing D1 lookups; request-boundary tests cover malformed and oversized values.
+- Static validation rejects inline event-handler attributes and `javascript:` links in the frontend, and rejects dynamic JavaScript evaluation patterns in the Worker. These are source-level guardrails, not a substitute for browser testing or an independent security audit.
