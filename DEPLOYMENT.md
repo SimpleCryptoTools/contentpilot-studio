@@ -15,6 +15,25 @@ The Worker is deployed separately from the GitHub Pages frontend.
 
 The account ID and existing D1/Workers AI bindings are defined in `wrangler.toml`. The deploy workflow is manual-only, so a normal commit does not publish the Worker unexpectedly.
 
+## Live D1 verification and release gate
+
+Follow [`D1_LIVE_VERIFICATION_RUNBOOK.md`](./D1_LIVE_VERIFICATION_RUNBOOK.md) for the ordered production identity, backup/restore, migration, staging integration and disposable-account checks. Steps 16–20 in the completion tracker remain open until evidence is recorded; this runbook does not itself verify or modify production D1.
+
+## Required D1 migration before deploying reservation changes
+
+The Worker now records every generation reservation durably so a repeated refund cannot credit a wallet or restore free quota twice. Authentication rate-limit storage is also provisioned through a versioned D1 migration rather than issuing schema DDL on user requests.
+
+Before deploying a Worker version that uses this lifecycle:
+
+1. Confirm the target is the existing `contentpilot-db` database and take/verify a recoverable backup.
+2. Review both `migrations/0001_generation_reservations.sql` and `migrations/0002_auth_rate_limits.sql`.
+3. Apply the migrations to the intended environment with Wrangler, for example: `npx wrangler d1 migrations apply contentpilot-db --remote`.
+4. Verify that `generation_reservations`, `auth_rate_limits`, and their indexes exist.
+5. Confirm the Worker configuration includes the hourly auth-rate-limit cleanup cron (`17 * * * *`).
+6. Only then deploy the Worker.
+
+Do not run the migration against production until the database identity and backup/restore path have been independently confirmed. This repository change does not apply the migration or deploy anything.
+
 ## Post-deploy verification
 
 - Confirm the workflow completes successfully.

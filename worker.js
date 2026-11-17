@@ -4,11 +4,9 @@
  *   AI  -> Workers AI
  *   DB  -> D1 database (contentpilot-db)
  *
- * Expected D1 tables (already created by the user):
- *   users, sessions, wallets, orders, credit_ledger, usage_daily
- *
- * The auth_rate_limits table is created automatically on the first
- * register/login request.
+ * Existing D1 tables: users, sessions, wallets, orders, credit_ledger, usage_daily.
+ * Apply migrations/0001_generation_reservations.sql and
+ * migrations/0002_auth_rate_limits.sql before deploying this version.
  *
  * Security notes:
  * - Text/image generation requires a valid session.
@@ -37,6 +35,41 @@ function httpError(status, message) {
   const error = new Error(message);
   error.status = status;
   return error;
+}
+
+async function readJsonBody(request, maxBytes) {
+  if (!request.body) throw httpError(400, "بدنه درخواست خالی است.");
+  const reader = request.body.getReader();
+  const chunks = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        await reader.cancel();
+        throw httpError(413, "حجم درخواست بیش از حد مجاز است.");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bodyBytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bodyBytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  try {
+    return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bodyBytes));
+  } catch (_) {
+    throw httpError(400, "ساختار JSON درخواست معتبر نیست.");
+  }
 }
 
 function randomHex(byteLength) {
@@ -77,6 +110,30 @@ async function derivePasswordHash(password, saltHex) {
     .join("");
 }
 
+function detectImageMime(base64) {
+  // Decode only a short prefix to identify the actual image format without
+  // allocating a second full-size copy of the generated image.
+  let prefix;
+  try {
+    prefix = atob(base64.slice(0, 32));
+  } catch (_) {
+    return null;
+  }
+  const byte = index => prefix.charCodeAt(index);
+  const isPng = prefix.length >= 8 &&
+    byte(0) === 0x89 && byte(1) === 0x50 && byte(2) === 0x4e &&
+    byte(3) === 0x47 && byte(4) === 0x0d && byte(5) === 0x0a &&
+    byte(6) === 0x1a && byte(7) === 0x0a;
+  const isJpeg = prefix.length >= 3 &&
+    byte(0) === 0xff && byte(1) === 0xd8 && byte(2) === 0xff;
+  const isWebp = prefix.length >= 12 &&
+    prefix.slice(0, 4) === "RIFF" && prefix.slice(8, 12) === "WEBP";
+  if (isPng) return "image/png";
+  if (isJpeg) return "image/jpeg";
+  if (isWebp) return "image/webp";
+  return null;
+}
+
 function constantTimeEqual(a, b) {
   if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) {
     return false;
@@ -96,16 +153,6 @@ function readBearerToken(request) {
 
 function utcDateString() {
   return new Date().toISOString().slice(0, 10);
-}
-
-async function ensureAuthRateLimitTable(db) {
-  await db.prepare(`
-    CREATE TABLE IF NOT EXISTS auth_rate_limits (
-      rate_key TEXT PRIMARY KEY,
-      window_started_at INTEGER NOT NULL,
-      attempts INTEGER NOT NULL DEFAULT 0
-    )
-  `).run();
 }
 
 async function bumpRateLimit(db, rateKey, maxAttempts, windowSeconds) {
@@ -129,9 +176,7 @@ async function bumpRateLimit(db, rateKey, maxAttempts, windowSeconds) {
   return Number(row?.attempts || 0) <= maxAttempts;
 }
 
-async function enforceAuthRateLimit(db, request, email, action) {
-  await ensureAuthRateLimitTable(db);
-
+export async function enforceAuthRateLimit(db, request, email, action) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown-client";
   const normalizedEmail = String(email || "unknown").trim().toLowerCase();
   const ipKey = await sha256(`cp:${action}:ip:${ip}`);
@@ -150,14 +195,6 @@ async function enforceAuthRateLimit(db, request, email, action) {
     action === "register" ? 4 : 8,
     15 * 60
   );
-
-  // Occasional cleanup of old hashed counters.
-  if (Math.floor(Date.now() / 1000) % 17 === 0) {
-    const cutoff = Math.floor(Date.now() / 1000) - 2 * 86400;
-    await db.prepare(
-      "DELETE FROM auth_rate_limits WHERE window_started_at < ?"
-    ).bind(cutoff).run();
-  }
 
   if (!ipAllowed || !accountAllowed) {
     throw httpError(
@@ -203,80 +240,124 @@ async function authenticate(db, request) {
   `).bind(tokenHash, now).first();
 }
 
-async function reserveGeneration(db, userId) {
+export async function reserveGeneration(db, userId) {
   const today = utcDateString();
+  const reservationId = crypto.randomUUID();
 
-  // Atomically reserve one of the three daily free generations.
-  const freeUse = await db.prepare(`
-    INSERT INTO usage_daily (user_id, action, usage_date, count)
-    VALUES (?, 'generation', ?, 1)
-    ON CONFLICT(user_id, action, usage_date)
-    DO UPDATE SET count = count + 1
-    WHERE usage_daily.count < ?
-    RETURNING count
-  `).bind(userId, today, FREE_DAILY_LIMIT).first();
+  // The quota increment and durable reservation record commit together.
+  // changes() prevents a reservation row when the free quota was exhausted.
+  const freeResults = await db.batch([
+    db.prepare(`
+      INSERT INTO usage_daily (user_id, action, usage_date, count)
+      VALUES (?, 'generation', ?, 1)
+      ON CONFLICT(user_id, action, usage_date)
+      DO UPDATE SET count = count + 1
+      WHERE usage_daily.count < ?
+    `).bind(userId, today, FREE_DAILY_LIMIT),
+    db.prepare(`
+      INSERT INTO generation_reservations
+        (id, user_id, reservation_type, usage_date, status, created_at, updated_at)
+      SELECT ?, ?, 'free', ?, 'reserved', unixepoch(), unixepoch()
+      WHERE changes() = 1
+    `).bind(reservationId, userId, today)
+  ]);
 
-  if (freeUse) {
-    return { type: "free", userId, date: today };
+  if (Number(freeResults?.[0]?.meta?.changes || 0) === 1) {
+    return { id: reservationId, type: "free", userId, date: today };
   }
 
-  // After free uses are exhausted, atomically consume one purchased credit.
-  const walletUpdate = await db.prepare(`
-    UPDATE wallets
-    SET credits = credits - 1, updated_at = unixepoch()
-    WHERE user_id = ? AND credits > 0
-    RETURNING credits
-  `).bind(userId).first();
+  const paidReservationId = crypto.randomUUID();
+  // Debit, ledger entry and durable reservation are one D1 transaction.
+  const paidResults = await db.batch([
+    db.prepare(`
+      UPDATE wallets
+      SET credits = credits - 1, updated_at = unixepoch()
+      WHERE user_id = ? AND credits > 0
+    `).bind(userId),
+    db.prepare(`
+      INSERT INTO credit_ledger (user_id, order_id, credit_change, reason)
+      SELECT ?, NULL, -1, 'AI generation'
+      WHERE changes() = 1
+    `).bind(userId),
+    db.prepare(`
+      INSERT INTO generation_reservations
+        (id, user_id, reservation_type, usage_date, status, created_at, updated_at)
+      SELECT ?, ?, 'credit', ?, 'reserved', unixepoch(), unixepoch()
+      WHERE changes() = 1
+    `).bind(paidReservationId, userId, today)
+  ]);
 
-  if (!walletUpdate) {
+  if (Number(paidResults?.[0]?.meta?.changes || 0) !== 1) {
     throw httpError(
       402,
       "سهمیه رایگان امروز تمام شده و اعتبار خریداری‌شده‌ای نداری."
     );
   }
 
-  try {
-    await db.prepare(`
-      INSERT INTO credit_ledger (user_id, order_id, credit_change, reason)
-      VALUES (?, NULL, -1, 'AI generation')
-    `).bind(userId).run();
-  } catch (error) {
-    await db.prepare(`
-      UPDATE wallets
-      SET credits = credits + 1, updated_at = unixepoch()
-      WHERE user_id = ?
-    `).bind(userId).run();
-    throw error;
-  }
-
-  return { type: "credit", userId };
+  return { id: paidReservationId, type: "credit", userId, date: today };
 }
 
-async function refundGeneration(db, reservation) {
-  if (!reservation) return;
+export async function completeGeneration(db, reservation) {
+  if (!reservation?.id) return false;
+  const result = await db.prepare(`
+    UPDATE generation_reservations
+    SET status = 'consumed', updated_at = unixepoch()
+    WHERE id = ? AND user_id = ? AND status = 'reserved'
+  `).bind(reservation.id, reservation.userId).run();
+  return Number(result?.meta?.changes || 0) === 1;
+}
+
+export async function refundGeneration(db, reservation) {
+  if (!reservation?.id) return false;
 
   if (reservation.type === "free") {
-    await db.prepare(`
-      UPDATE usage_daily
-      SET count = CASE WHEN count > 0 THEN count - 1 ELSE 0 END
-      WHERE user_id = ? AND action = 'generation' AND usage_date = ?
-    `).bind(reservation.userId, reservation.date).run();
-    return;
+    const results = await db.batch([
+      db.prepare(`
+        UPDATE usage_daily
+        SET count = CASE WHEN count > 0 THEN count - 1 ELSE 0 END
+        WHERE user_id = ? AND action = 'generation' AND usage_date = ?
+          AND EXISTS (
+            SELECT 1 FROM generation_reservations
+            WHERE id = ? AND user_id = ? AND status = 'reserved'
+          )
+      `).bind(reservation.userId, reservation.date, reservation.id, reservation.userId),
+      db.prepare(`
+        UPDATE generation_reservations
+        SET status = 'refunded', updated_at = unixepoch()
+        WHERE id = ? AND user_id = ? AND status = 'reserved'
+          AND changes() = 1
+      `).bind(reservation.id, reservation.userId)
+    ]);
+    return Number(results?.[1]?.meta?.changes || 0) === 1;
   }
 
   if (reservation.type === "credit") {
-    await db.batch([
+    const results = await db.batch([
       db.prepare(`
         UPDATE wallets
         SET credits = credits + 1, updated_at = unixepoch()
         WHERE user_id = ?
-      `).bind(reservation.userId),
+          AND EXISTS (
+            SELECT 1 FROM generation_reservations
+            WHERE id = ? AND user_id = ? AND status = 'reserved'
+          )
+      `).bind(reservation.userId, reservation.id, reservation.userId),
+      db.prepare(`
+        UPDATE generation_reservations
+        SET status = 'refunded', updated_at = unixepoch()
+        WHERE id = ? AND user_id = ? AND status = 'reserved'
+          AND changes() = 1
+      `).bind(reservation.id, reservation.userId),
       db.prepare(`
         INSERT INTO credit_ledger (user_id, order_id, credit_change, reason)
-        VALUES (?, NULL, 1, 'AI generation refund')
+        SELECT ?, NULL, 1, 'AI generation refund'
+        WHERE changes() = 1
       `).bind(reservation.userId)
     ]);
+    return Number(results?.[1]?.meta?.changes || 0) === 1;
   }
+
+  return false;
 }
 
 async function getUsageSnapshot(db, userId) {
@@ -294,21 +375,43 @@ async function getUsageSnapshot(db, userId) {
 
 export default {
   async fetch(request, env) {
-    // This API uses bearer tokens rather than cookies. A wildcard CORS
-    // response is therefore compatible with cross-origin fetch requests.
-    // CORS is not authentication: every account and generation endpoint
-    // still validates the session token below.
+    // Browser access is limited to the production frontend origins.
+    // Requests without an Origin header (for example, trusted server-side
+    // tools) are not treated as browser cross-origin requests. CORS is not
+    // authentication: protected endpoints still validate bearer sessions.
+    const allowedOrigins = new Set([
+      "https://contentpilot.ir",
+      "https://www.contentpilot.ir"
+    ]);
+    const requestOrigin = request.headers.get("Origin");
+    const originAllowed = !requestOrigin || allowedOrigins.has(requestOrigin);
     const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Max-Age": "86400",
       "Content-Type": "application/json; charset=UTF-8",
-      "Cache-Control": "no-store"
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+      "Vary": "Origin"
     };
+    if (requestOrigin && originAllowed) {
+      corsHeaders["Access-Control-Allow-Origin"] = requestOrigin;
+    }
 
-    // Always answer the browser preflight before parsing a body or checking
-    // authentication. The previous Origin comparison caused OPTIONS 403.
+    // Reject browser origins outside the explicit production allowlist.
+    // This is a browser boundary only; bearer authentication remains required.
+    if (!originAllowed) {
+      return jsonResponse(
+        { error: "مبدأ درخواست مجاز نیست." },
+        403,
+        corsHeaders
+      );
+    }
+
+    // Always answer preflight before parsing a body or checking authentication.
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
@@ -321,10 +424,19 @@ export default {
       );
     }
 
-    if (!env.DB || !env.AI) {
+    const contentType = request.headers.get("Content-Type") || "";
+    if (!/^application\/json(?:\s*;|$)/i.test(contentType)) {
       return jsonResponse(
-        { error: "اتصال دیتابیس یا هوش مصنوعی تنظیم نشده است." },
-        500,
+        { error: "نوع محتوای درخواست باید JSON باشد." },
+        415,
+        corsHeaders
+      );
+    }
+    const declaredLength = Number(request.headers.get("Content-Length") || 0);
+    if (declaredLength > 16 * 1024) {
+      return jsonResponse(
+        { error: "حجم درخواست بیش از حد مجاز است." },
+        413,
         corsHeaders
       );
     }
@@ -333,9 +445,13 @@ export default {
     let userForRefund = null;
 
     try {
-      const body = await request.json();
+      const body = await readJsonBody(request, 16 * 1024);
       if (!body || typeof body !== "object" || Array.isArray(body)) {
         throw httpError(400, "اطلاعات ارسالی معتبر نیست.");
+      }
+
+      if (!env.DB) {
+        throw httpError(500, "اتصال دیتابیس تنظیم نشده است.");
       }
 
       const action = String(body.action || "text").trim();
@@ -400,7 +516,7 @@ export default {
         const email = String(body.email || "").trim().toLowerCase();
         const password = String(body.password || "");
 
-        if (email.length > 254 || password.length > 128 || !email) {
+        if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length > 128 || !password) {
           throw httpError(400, "ایمیل یا رمز عبور معتبر نیست.");
         }
 
@@ -474,6 +590,9 @@ export default {
         if (prompt.length > 1400) {
           throw httpError(400, "توضیح تصویر بیش از حد طولانی است.");
         }
+        if (!env.AI) {
+          throw httpError(500, "اتصال هوش مصنوعی تنظیم نشده است.");
+        }
 
         reservation = await reserveGeneration(env.DB, currentUser.id);
 
@@ -501,11 +620,18 @@ Create only the visual image.
         if (!imageResult || typeof imageResult.image !== "string" || !imageResult.image) {
           throw new Error("Image model returned no image.");
         }
+        const imageMime = detectImageMime(imageResult.image);
+        if (!imageMime) {
+          throw new Error("Image model returned an unsupported or invalid image format.");
+        }
 
         const usage = await getUsageSnapshot(env.DB, currentUser.id);
+        if (!await completeGeneration(env.DB, reservation)) {
+          throw new Error("Could not finalize the generation reservation.");
+        }
         reservation = null;
         return jsonResponse({
-          imageData: "data:image/jpeg;base64," + imageResult.image,
+          imageData: "data:" + imageMime + ";base64," + imageResult.image,
           imageType,
           usage
         }, 200, corsHeaders);
@@ -532,6 +658,9 @@ Create only the visual image.
       if (!topic) throw httpError(400, "لطفاً موضوع محتوا را وارد کن.");
       if (topic.length > 500) {
         throw httpError(400, "موضوع باید کمتر از ۵۰۰ نویسه باشد.");
+      }
+      if (!env.AI) {
+        throw httpError(500, "اتصال هوش مصنوعی تنظیم نشده است.");
       }
 
       reservation = await reserveGeneration(env.DB, currentUser.id);
@@ -578,6 +707,9 @@ Create only the visual image.
       if (!generatedText) throw new Error("AI returned an empty response.");
 
       const usage = await getUsageSnapshot(env.DB, currentUser.id);
+      if (!await completeGeneration(env.DB, reservation)) {
+        throw new Error("Could not finalize the generation reservation.");
+      }
       reservation = null;
       return jsonResponse({ text: generatedText, usage }, 200, corsHeaders);
 
@@ -601,5 +733,16 @@ Create only the visual image.
 
       return jsonResponse({ error: message }, status, corsHeaders);
     }
+  },
+
+  // Expired hashed counters are pruned hourly, outside user-facing requests.
+  async scheduled(_controller, env, ctx) {
+    if (!env.DB) return;
+    const cutoff = Math.floor(Date.now() / 1000) - 2 * 86400;
+    ctx.waitUntil(
+      env.DB.prepare(
+        "DELETE FROM auth_rate_limits WHERE window_started_at < ?"
+      ).bind(cutoff).run()
+    );
   }
 };

@@ -7,11 +7,12 @@
   <meta name="theme-color" content="#10162b">
   <meta name="description" content="Plan, write and repurpose social media posts, captions, videos, product copy, emails and blog content with an AI content studio supporting 11 output languages.">
   <meta name="robots" content="index,follow,max-image-preview:large">
-  <link rel="canonical" href="https://simplecryptotools.github.io/contentpilot-studio/">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="canonical" href="https://contentpilot.ir/">
   <meta property="og:title" content="ContentPilot Studio | Global AI Content Studio">
   <meta property="og:description" content="Plan, write and repurpose social media posts, captions, videos, product copy, emails and blog content in 11 output languages.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://simplecryptotools.github.io/contentpilot-studio/">
+  <meta property="og:url" content="https://contentpilot.ir/">
   <meta property="og:site_name" content="ContentPilot Studio">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="ContentPilot Studio | Global AI Content Studio">
@@ -22,7 +23,7 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "ContentPilot Studio",
-    "url": "https://simplecryptotools.github.io/contentpilot-studio/",
+    "url": "https://contentpilot.ir/",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Any",
     "inLanguage": ["en", "fa", "es", "fr", "de", "pt", "ar", "hi", "ja", "it", "tr"],
@@ -47,6 +48,29 @@
 
     html { scroll-behavior: smooth; }
     :focus-visible { outline: 3px solid var(--secondary); outline-offset: 3px; }
+    .skip-link {
+      position: absolute;
+      inset-block-start: 8px;
+      inset-inline-start: 8px;
+      z-index: 1000;
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: #10162b;
+      background: #fff;
+      transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
@@ -773,7 +797,8 @@
 </head>
 
 <body>
-<header>
+<a class="skip-link" href="#mainContent" data-i18n="skipToContent">Skip to main content</a>
+  <header>
   <div class="container nav">
     <a class="brand" href="#">
       <span class="brand-icon">✦</span>
@@ -794,7 +819,7 @@
   </div>
 </header>
 
-<main>
+<main id="mainContent" tabindex="-1">
   <section class="hero">
     <div class="container">
       <div class="eyebrow">
@@ -854,8 +879,10 @@
           <p data-i18n="accountDescription">ثبت‌نام کن تا سه استفادهٔ رایگان روزانه و موجودی اعتبارت را مدیریت کنی.</p>
         </div>
         <form class="account-form" id="authForm">
-          <input id="authEmail" type="email" maxlength="254" autocomplete="email" required data-i18n-placeholder="emailPlaceholder" placeholder="ایمیل" aria-label="Email">
-          <input id="authPassword" type="password" minlength="10" maxlength="128" autocomplete="current-password" required data-i18n-placeholder="passwordPlaceholder" placeholder="رمز عبور (حداقل ۱۰ نویسه)" aria-label="Password">
+          <label class="sr-only" for="authEmail" data-i18n="emailPlaceholder">Email</label>
+          <input id="authEmail" type="email" maxlength="254" autocomplete="email" required data-i18n-placeholder="emailPlaceholder" placeholder="ایمیل">
+          <label class="sr-only" for="authPassword" data-i18n="passwordPlaceholder">Password</label>
+          <input id="authPassword" type="password" minlength="10" maxlength="128" autocomplete="current-password" required data-i18n-placeholder="passwordPlaceholder" placeholder="رمز عبور (حداقل ۱۰ نویسه)">
           <div class="account-form-actions">
             <button class="primary-button" type="submit" id="authSubmit" data-i18n="registerButton">ایجاد حساب</button>
             <button class="account-toggle" type="button" id="authToggle" data-i18n="switchToLogin">قبلاً حساب داری؟ ورود</button>
@@ -1258,7 +1285,7 @@
 (function () {
   "use strict";
 
-  const API_URL = "https://contentpilot-ai.mohannahaddadi363.workers.dev/";
+  const API_URL = "https://api.contentpilot.ir/";
 
   const translations = {
     fa: {
@@ -1415,6 +1442,7 @@
       imageSuccess: "تصویر آماده شد.",
       accountTitle: "حساب کاربری و کیف اعتبار",
       accountDescription: "ثبت‌نام کن تا سه استفادهٔ رایگان روزانه و موجودی اعتبارت را مدیریت کنی.",
+      skipToContent: "رفتن به محتوای اصلی",
       emailPlaceholder: "ایمیل",
       passwordPlaceholder: "رمز عبور (حداقل ۱۰ نویسه)",
       registerButton: "ایجاد حساب",
@@ -1588,6 +1616,7 @@
       imageSuccess: "Your image is ready.",
       accountTitle: "Account and credit wallet",
       accountDescription: "Create an account to manage your three free daily generations and credits.",
+      skipToContent: "Skip to main content",
       emailPlaceholder: "Email address",
       passwordPlaceholder: "Password (at least 10 characters)",
       registerButton: "Create account",
@@ -1697,13 +1726,20 @@
   }
 
   function showPlaceholder() {
-    $("output").innerHTML = `
-      <div class="output-placeholder">
-        <span>📝</span>
-        <strong>${t("emptyTitle")}</strong>
-        <small>${t("emptyDesc")}</small>
-      </div>
-    `;
+    const placeholder = document.createElement("div");
+    placeholder.className = "output-placeholder";
+
+    const icon = document.createElement("span");
+    icon.textContent = "📝";
+
+    const title = document.createElement("strong");
+    title.textContent = t("emptyTitle");
+
+    const description = document.createElement("small");
+    description.textContent = t("emptyDesc");
+
+    placeholder.append(icon, title, description);
+    $("output").replaceChildren(placeholder);
   }
 
   function hideNotices() {
