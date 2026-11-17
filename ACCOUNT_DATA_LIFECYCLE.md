@@ -32,6 +32,8 @@ This is a repository-level inventory based on SQL statements and browser storage
 
 ## Current decision
 
+**Product decision: drafts and calendar entries remain browser-local for this release; they are not account-synced.** This matches the current implementation and avoids implying cross-device backup or server-side retention. Users manage these records per browser profile; clearing site data may permanently remove them. Revisit account sync only as a separate product decision with authentication, export/deletion behavior and retention rules designed first.
+
 Do not add a destructive account-deletion endpoint until the production schema and financial-record retention policy are verified. The existing migration only guarantees cascade deletion for generation_reservations; it does not prove that deleting a user is safe for the other tables. Keep this as a documented pre-launch blocker rather than guessing at foreign keys or deleting ledger/order history.
 
 ## Safe schema inspection (operator-run only)
