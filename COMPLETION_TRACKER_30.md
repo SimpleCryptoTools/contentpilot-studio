@@ -24,7 +24,9 @@ Legend:
 ## B. Verification and database
 
 - [x] 13. Add automated frontend/Worker syntax and static validation.
+  Additional guardrails: static checks now reject inline event-handler attributes, `javascript:` links and dynamic JavaScript evaluation in the Worker.
 - [x] 14. Add Worker request-boundary and mocked account/quota tests.
+  Additional coverage: malformed and oversized registration/login email inputs are rejected before D1 access; login email syntax is validated before rate-limit/database queries.
 - [x] 15. Add SQLite migration-schema tests.
 - [ ] 16. Verify the actual production D1 database identity, schema and existing data.
 - [ ] 17. Take a recoverable D1 backup and prove the restore procedure in a safe environment.
@@ -44,6 +46,7 @@ Legend:
   Preparation: `DATA_RETENTION_REVIEW.md` consolidates known data classes and unresolved decisions. Retention periods remain unapproved; production schema and provider settings are not verified.
 - [ ] 24. Implement account deletion and user data export/correction only after the schema and retention rules are approved.
 - [ ] 25. Complete the privacy notice with the operator identity, contact, providers, retention and jurisdiction-specific review.
+  Preparation: `PRIVACY_NOTICE_DRAFT.md` now consistently states that drafts/calendar remain browser-local and are not account-synced. Operator identity/contact, final deployed providers, approved retention and legal review remain outstanding.
   Preparation: lifecycle and provider gaps are cross-referenced in `DATA_RETENTION_REVIEW.md`; legal operator identity, contact, final provider configuration and jurisdictional review still require owner/legal input.
 - [x] 26. Keep drafts and calendar browser-local for this release; document that they are not account-synced and may be lost when browser/site data is cleared.
 - [ ] 27. Configure production logs, monitoring, alerting, incident contact and an operational runbook.
