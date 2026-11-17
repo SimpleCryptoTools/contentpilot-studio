@@ -391,6 +391,10 @@ export default {
       "Access-Control-Max-Age": "86400",
       "Content-Type": "application/json; charset=UTF-8",
       "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
       "Vary": "Origin"
     };
     if (requestOrigin && originAllowed) {
