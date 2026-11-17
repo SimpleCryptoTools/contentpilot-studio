@@ -32,6 +32,8 @@ Legend:
 - [ ] 19. Run integration tests against real D1, including concurrent quota reservations, duplicate refunds and failure recovery.
 - [ ] 20. Test registration, login, logout, session expiry, text generation and image generation end-to-end with a disposable account.
 
+  Preparation: `D1_LIVE_VERIFICATION_RUNBOOK.md` documents the safe read-only identity/schema checks, isolated backup/restore proof, migration gate, staging D1 concurrency/recovery tests and disposable-account E2E protocol. These steps remain unchecked until live evidence is recorded.
+
 ## C. Account lifecycle, privacy and operations
 
 - [ ] 21. Implement email ownership verification with expiring, single-use verification tokens and a configured delivery provider.
