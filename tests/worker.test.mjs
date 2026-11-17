@@ -12,7 +12,10 @@ const call = (url, init) => worker.fetch(new Request(url, init), env);
 
 function assertBaselineSecurityHeaders(response) {
   assert.equal(response.headers.get("Cache-Control"), "no-store");
-  assertBaselineSecurityHeaders(response);
+  assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
+  assert.equal(response.headers.get("X-Frame-Options"), "DENY");
+  assert.equal(response.headers.get("Referrer-Policy"), "strict-origin-when-cross-origin");
+  assert.equal(response.headers.get("Permissions-Policy"), "camera=(), microphone=(), geolocation=()");
   assert.match(response.headers.get("Vary") || "", /Origin/i);
 }
 
