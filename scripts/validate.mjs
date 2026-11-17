@@ -114,6 +114,17 @@ for (const control of formControls) {
 }
 process.stdout.write("PASS accessible names for all form controls\n");
 
+if (/\\son[a-z]+\\s*=/i.test(html)) {
+  throw new Error("Frontend must not use inline event-handler attributes");
+}
+if (/href\\s*=\\s*["']\\s*javascript:/i.test(html)) {
+  throw new Error("Frontend must not contain javascript: links");
+}
+if (/\\beval\\s*\\(|new\\s+Function\\s*\\(/.test(worker)) {
+  throw new Error("Worker must not evaluate dynamically constructed JavaScript");
+}
+process.stdout.write("PASS inline-handler, javascript-URL and dynamic-evaluation checks\\n");
+
 process.stdout.write("PASS frontend DOM-sink and referrer-policy checks\n");
 
 process.stdout.write("PASS unique HTML IDs and required product features\n");
