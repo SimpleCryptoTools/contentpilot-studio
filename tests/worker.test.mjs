@@ -790,3 +790,48 @@ test("scheduled auth cleanup safely skips when D1 is unavailable", async () => {
   });
   assert.equal(waitUntilCalled, false);
 });
+
+
+test("rejects malformed registration email before accessing D1", async () => {
+  let databaseCalls = 0;
+  const db = {
+    prepare() {
+      databaseCalls++;
+      throw new Error("D1 must not be queried for malformed registration email");
+    }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ action: "register", email: "not-an-email", password: "valid-password-123" })
+  }), { DB: db });
+
+  assert.equal(response.status, 400);
+  assertBaselineSecurityHeaders(response);
+  assert.equal(databaseCalls, 0);
+});
+
+test("rejects empty login email before accessing D1", async () => {
+  let databaseCalls = 0;
+  const db = {
+    prepare() {
+      databaseCalls++;
+      throw new Error("D1 must not be queried for empty login email");
+    }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ action: "login", email: "", password: "some-password" })
+  }), { DB: db });
+
+  assert.equal(response.status, 400);
+  assertBaselineSecurityHeaders(response);
+  assert.equal(databaseCalls, 0);
+});
