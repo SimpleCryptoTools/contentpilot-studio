@@ -40,6 +40,17 @@ for (const required of ["caption:", "hashtags:", "repurpose:", "seo:"]) {
 if (!html.includes('<meta name="referrer" content="strict-origin-when-cross-origin">')) {
   throw new Error("Frontend must use a restrictive cross-origin referrer policy");
 }
+
+for (const requiredHeader of [
+  '"X-Content-Type-Options": "nosniff"',
+  '"X-Frame-Options": "DENY"',
+  '"Referrer-Policy": "strict-origin-when-cross-origin"',
+  '"Permissions-Policy": "camera=(), microphone=(), geolocation=()"'
+]) {
+  if (!worker.includes(requiredHeader)) {
+    throw new Error("Worker response is missing a security header: " + requiredHeader);
+  }
+}
 if (html.includes('.innerHTML')) {
   throw new Error("Frontend must not write HTML through innerHTML; build placeholder content with DOM APIs");
 }
