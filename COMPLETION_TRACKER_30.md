@@ -39,7 +39,7 @@ Legend:
 - [ ] 23. Verify the complete account/data inventory and define retention rules for financial, security, session and backup records.
 - [ ] 24. Implement account deletion and user data export/correction only after the schema and retention rules are approved.
 - [ ] 25. Complete the privacy notice with the operator identity, contact, providers, retention and jurisdiction-specific review.
-- [ ] 26. Decide whether drafts and calendar remain browser-local or become account-synced; document the chosen behavior.
+- [x] 26. Keep drafts and calendar browser-local for this release; document that they are not account-synced and may be lost when browser/site data is cleared.
 - [ ] 27. Configure production logs, monitoring, alerting, incident contact and an operational runbook.
 - [x] 28a. Add and test baseline security headers on Worker API responses (`nosniff`, frame denial, strict referrer policy and restrictive device permissions).
 - [ ] 28b. Configure and verify appropriate response security headers for the static frontend at the CDN/edge; a static HTML meta tag is not a substitute for HTTP headers.
