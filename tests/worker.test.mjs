@@ -835,3 +835,48 @@ test("rejects empty login email before accessing D1", async () => {
   assertBaselineSecurityHeaders(response);
   assert.equal(databaseCalls, 0);
 });
+
+
+test("rejects malformed login email before accessing D1", async () => {
+  let databaseCalls = 0;
+  const db = {
+    prepare() {
+      databaseCalls++;
+      throw new Error("D1 must not be queried for malformed login email");
+    }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ action: "login", email: "not-an-email", password: "some-password" })
+  }), { DB: db });
+
+  assert.equal(response.status, 400);
+  assertBaselineSecurityHeaders(response);
+  assert.equal(databaseCalls, 0);
+});
+
+test("rejects oversized login email before accessing D1", async () => {
+  let databaseCalls = 0;
+  const db = {
+    prepare() {
+      databaseCalls++;
+      throw new Error("D1 must not be queried for oversized login email");
+    }
+  };
+  const response = await worker.fetch(new Request("https://api.contentpilot.ir/", {
+    method: "POST",
+    headers: {
+      Origin: "https://contentpilot.ir",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ action: "login", email: "a".repeat(255) + "@example.com", password: "some-password" })
+  }), { DB: db });
+
+  assert.equal(response.status, 400);
+  assertBaselineSecurityHeaders(response);
+  assert.equal(databaseCalls, 0);
+});
