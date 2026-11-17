@@ -41,7 +41,8 @@ Legend:
 - [ ] 25. Complete the privacy notice with the operator identity, contact, providers, retention and jurisdiction-specific review.
 - [ ] 26. Decide whether drafts and calendar remain browser-local or become account-synced; document the chosen behavior.
 - [ ] 27. Configure production logs, monitoring, alerting, incident contact and an operational runbook.
-- [ ] 28. Configure and verify appropriate response security headers at the CDN/edge; a static HTML meta tag is not a substitute for HTTP headers.
+- [x] 28a. Add and test baseline security headers on Worker API responses (`nosniff`, frame denial, strict referrer policy and restrictive device permissions).
+- [ ] 28b. Configure and verify appropriate response security headers for the static frontend at the CDN/edge; a static HTML meta tag is not a substitute for HTTP headers.
 
 ## D. Domain and launch
 
