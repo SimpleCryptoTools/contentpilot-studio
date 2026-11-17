@@ -18,6 +18,10 @@ test("allows CORS preflight from the apex frontend", async () => {
   assert.equal(response.status, 204);
   assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://contentpilot.ir");
   assert.match(response.headers.get("Vary") || "", /Origin/i);
+  assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
+  assert.equal(response.headers.get("X-Frame-Options"), "DENY");
+  assert.equal(response.headers.get("Referrer-Policy"), "strict-origin-when-cross-origin");
+  assert.equal(response.headers.get("Permissions-Policy"), "camera=(), microphone=(), geolocation=()");
 });
 
 test("allows CORS preflight from the www frontend", async () => {
