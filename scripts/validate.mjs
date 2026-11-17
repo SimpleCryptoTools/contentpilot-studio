@@ -44,6 +44,24 @@ if (!html.includes('<meta name="referrer" content="strict-origin-when-cross-orig
 const lifecycle = readFileSync("ACCOUNT_DATA_LIFECYCLE.md", "utf8");
 const privacy = readFileSync("PRIVACY_NOTICE_DRAFT.md", "utf8");
 const tracker = readFileSync("COMPLETION_TRACKER_30.md", "utf8");
+const d1Runbook = readFileSync("D1_LIVE_VERIFICATION_RUNBOOK.md", "utf8");
+for (const required of [
+  "22b74080-2843-4629-bc37-af0ba790ed08",
+  "npx wrangler d1 info contentpilot-db --json",
+  "npx wrangler d1 export contentpilot-db --remote",
+  "npx wrangler d1 migrations apply contentpilot-db --remote",
+  "staging Worker",
+  "disposable account",
+  "Do not restore over production",
+  "Steps 16–20 remain unchecked"
+]) {
+  if (!d1Runbook.includes(required)) {
+    throw new Error("D1 verification runbook is missing a release safety requirement: " + required);
+  }
+}
+if (d1Runbook.includes("--skip-confirmation") || d1Runbook.includes("--yes")) {
+  throw new Error("D1 runbook must not bypass Cloudflare confirmation prompts");
+}
 for (const [label, source] of [
   ["account lifecycle", lifecycle],
   ["privacy notice", privacy],
