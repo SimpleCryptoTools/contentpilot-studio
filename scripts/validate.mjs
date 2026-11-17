@@ -227,7 +227,7 @@ if (!readFileSync("wrangler.toml", "utf8").includes('crons = ["17 * * * *"]')) {
 process.stdout.write("PASS scheduled auth rate-limit expiry cleanup checks\\n");
 
 const releaseDocs = [
-  ["EMAIL_VERIFICATION_DESIGN.md", ["single-use", "SHA-256", "fixed, configured HTTPS origin"]],
+  ["EMAIL_VERIFICATION_DESIGN.md", ["single-use", "SHA-256", "fixed, configured HTTPS confirmation origin"]],
   ["PASSWORD_RESET_DESIGN.md", ["generic response", "revoke all existing sessions", "single-use"]],
   ["DATA_RETENTION_REVIEW.md", ["No retention durations are approved", "production D1 schema"]],
   ["OPERATIONS_RUNBOOK.md", ["Never restore over production", "Never log passwords"]],
