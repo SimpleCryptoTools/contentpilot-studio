@@ -15,6 +15,10 @@ The Worker is deployed separately from the GitHub Pages frontend.
 
 The account ID and existing D1/Workers AI bindings are defined in `wrangler.toml`. The deploy workflow is manual-only, so a normal commit does not publish the Worker unexpectedly.
 
+## Live D1 verification and release gate
+
+Follow [`D1_LIVE_VERIFICATION_RUNBOOK.md`](./D1_LIVE_VERIFICATION_RUNBOOK.md) for the ordered production identity, backup/restore, migration, staging integration and disposable-account checks. Steps 16–20 in the completion tracker remain open until evidence is recorded; this runbook does not itself verify or modify production D1.
+
 ## Required D1 migration before deploying reservation changes
 
 The Worker now records every generation reservation durably so a repeated refund cannot credit a wallet or restore free quota twice. Authentication rate-limit storage is also provisioned through a versioned D1 migration rather than issuing schema DDL on user requests.
