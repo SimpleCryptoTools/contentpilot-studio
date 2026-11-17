@@ -37,19 +37,26 @@ Legend:
 ## C. Account lifecycle, privacy and operations
 
 - [ ] 21. Implement email ownership verification with expiring, single-use verification tokens and a configured delivery provider.
+  Preparation: `EMAIL_VERIFICATION_DESIGN.md` specifies token hashing, expiry, one-time use, anti-enumeration, rate limits and schema/provider prerequisites. No provider or verification flow is active.
 - [ ] 22. Implement secure password reset with expiring, single-use tokens and abuse controls.
+  Preparation: `PASSWORD_RESET_DESIGN.md` specifies generic responses, hashed tokens, session revocation and required tests. No reset endpoint or delivery provider is active.
 - [ ] 23. Verify the complete account/data inventory and define retention rules for financial, security, session and backup records.
+  Preparation: `DATA_RETENTION_REVIEW.md` consolidates known data classes and unresolved decisions. Retention periods remain unapproved; production schema and provider settings are not verified.
 - [ ] 24. Implement account deletion and user data export/correction only after the schema and retention rules are approved.
 - [ ] 25. Complete the privacy notice with the operator identity, contact, providers, retention and jurisdiction-specific review.
+  Preparation: lifecycle and provider gaps are cross-referenced in `DATA_RETENTION_REVIEW.md`; legal operator identity, contact, final provider configuration and jurisdictional review still require owner/legal input.
 - [x] 26. Keep drafts and calendar browser-local for this release; document that they are not account-synced and may be lost when browser/site data is cleared.
 - [ ] 27. Configure production logs, monitoring, alerting, incident contact and an operational runbook.
+  Preparation: `OPERATIONS_RUNBOOK.md` defines privacy-safe telemetry, alert candidates and incident handling. No production logging, alert or contact setting has been configured.
 - [x] 28a. Add and test baseline security headers on Worker API responses (`nosniff`, frame denial, strict referrer policy and restrictive device permissions).
 - [ ] 28b. Configure and verify appropriate response security headers for the static frontend at the CDN/edge; a static HTML meta tag is not a substitute for HTTP headers.
+  Preparation: `FRONTEND_EDGE_SECURITY_HEADERS.md` records the target policy and CSP compatibility risks. GitHub Pages response headers are not configured by this repository.
 
 ## D. Domain and launch
 
 - [ ] 29. Activate the Cloudflare zone using the exact nameservers assigned to this domain, then configure GitHub Pages DNS and the Worker custom domain on `api.contentpilot.ir`; verify HTTPS and both hosts.
 - [ ] 30. Complete mobile/desktop/browser checks and an independent security review. Keep payments disabled unless a provider integration with signature verification, replay protection, idempotent fulfillment and refund tests has separately passed.
+  Preparation: `BROWSER_QA_CHECKLIST.md` defines a staging-only desktop/mobile/browser matrix and evidence requirements. No manual device run or independent security review is claimed.
 
 ## Current evidence and blockers
 
