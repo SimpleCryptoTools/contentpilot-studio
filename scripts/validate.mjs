@@ -225,3 +225,22 @@ if (!readFileSync("wrangler.toml", "utf8").includes('crons = ["17 * * * *"]')) {
   throw new Error("Worker must schedule hourly auth rate-limit cleanup");
 }
 process.stdout.write("PASS scheduled auth rate-limit expiry cleanup checks\\n");
+
+const releaseDocs = [
+  ["EMAIL_VERIFICATION_DESIGN.md", ["single-use", "SHA-256", "fixed configured HTTPS origin"]],
+  ["PASSWORD_RESET_DESIGN.md", ["generic response", "revoke all existing sessions", "single-use"]],
+  ["DATA_RETENTION_REVIEW.md", ["No retention durations are approved", "production D1 schema"]],
+  ["OPERATIONS_RUNBOOK.md", ["Never restore over production", "Never log passwords"]],
+  ["FRONTEND_EDGE_SECURITY_HEADERS.md", ["GitHub Pages", "frame-ancestors", "unsafe-inline"]],
+  ["BROWSER_QA_CHECKLIST.md", ["iOS Safari", "Android Chrome", "independent security review"]]
+];
+for (const [path, requiredPhrases] of releaseDocs) {
+  const content = readFileSync(path, "utf8");
+  for (const phrase of requiredPhrases) {
+    if (!content.includes(phrase)) {
+      throw new Error(path + " is missing required safety/acceptance guidance: " + phrase);
+    }
+  }
+}
+process.stdout.write("PASS account lifecycle, retention, operations, edge-header and browser-QA documentation checks\\n");
+
