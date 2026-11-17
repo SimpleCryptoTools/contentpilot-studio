@@ -87,3 +87,14 @@ This review is based on static inspection of the repository. It is not a live pe
 ## Release gate
 
 Do not announce a public launch, enable payments, or treat the custom domain as operational until all required domain, functional, account-lifecycle and operational checks above have been completed.
+
+
+## Additional repository-only readiness preparation
+
+- Email verification design: see `EMAIL_VERIFICATION_DESIGN.md`. This is a design only; there is no delivery provider or verified-email enforcement.
+- Password recovery design: see `PASSWORD_RESET_DESIGN.md`. This is a design only; there is no reset endpoint or email delivery.
+- Data inventory and unresolved retention decisions: see `DATA_RETENTION_REVIEW.md`. No retention period or legal policy is approved by that document.
+- Operations and incident handling preparation: see `OPERATIONS_RUNBOOK.md`. Production logging, alerts and incident contacts are not configured or verified.
+- Frontend edge-header specification: see `FRONTEND_EDGE_SECURITY_HEADERS.md`. GitHub Pages does not receive arbitrary response headers from repository files; no edge policy is active.
+- Manual browser/device QA matrix: see `BROWSER_QA_CHECKLIST.md`. No browser/device execution or independent audit is claimed.
+- Worker tests now also reject malformed registration email and empty login email before touching D1; they remain local mocked request-boundary tests.
