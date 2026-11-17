@@ -10,6 +10,12 @@ const worker = (await import(workerModuleUrl)).default;
 const env = {}; // Boundary tests use no live D1 or Workers AI services.
 const call = (url, init) => worker.fetch(new Request(url, init), env);
 
+function assertBaselineSecurityHeaders(response) {
+  assert.equal(response.headers.get("Cache-Control"), "no-store");
+  assertBaselineSecurityHeaders(response);
+  assert.match(response.headers.get("Vary") || "", /Origin/i);
+}
+
 test("allows CORS preflight from the apex frontend", async () => {
   const response = await call("https://api.contentpilot.ir/", {
     method: "OPTIONS",
@@ -31,6 +37,7 @@ test("allows CORS preflight from the www frontend", async () => {
   });
   assert.equal(response.status, 204);
   assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://www.contentpilot.ir");
+  assertBaselineSecurityHeaders(response);
 });
 
 test("rejects an unapproved browser origin", async () => {
@@ -40,6 +47,7 @@ test("rejects an unapproved browser origin", async () => {
   });
   assert.equal(response.status, 403);
   assert.equal(response.headers.get("Access-Control-Allow-Origin"), null);
+  assertBaselineSecurityHeaders(response);
 });
 
 test("rejects methods other than POST after preflight handling", async () => {
@@ -48,6 +56,7 @@ test("rejects methods other than POST after preflight handling", async () => {
     headers: { Origin: "https://contentpilot.ir" }
   });
   assert.equal(response.status, 405);
+  assertBaselineSecurityHeaders(response);
 });
 
 test("rejects non-JSON POST bodies", async () => {
@@ -60,6 +69,7 @@ test("rejects non-JSON POST bodies", async () => {
     body: "not json"
   });
   assert.equal(response.status, 415);
+  assertBaselineSecurityHeaders(response);
 });
 
 test("rejects requests declaring a body larger than 16 KiB", async () => {
@@ -73,6 +83,7 @@ test("rejects requests declaring a body larger than 16 KiB", async () => {
     body: "{}"
   });
   assert.equal(response.status, 413);
+  assertBaselineSecurityHeaders(response);
 });
 
 test("rejects an oversized streamed body even without Content-Length", async () => {
@@ -100,6 +111,7 @@ test("returns a client error for malformed JSON", async () => {
     body: "{invalid"
   });
   assert.equal(response.status, 400);
+  assertBaselineSecurityHeaders(response);
 });
 
 test("fails closed for valid JSON when service bindings are missing", async () => {
@@ -112,6 +124,7 @@ test("fails closed for valid JSON when service bindings are missing", async () =
     body: JSON.stringify({ action: "me" })
   });
   assert.equal(response.status, 500);
+  assertBaselineSecurityHeaders(response);
 });
 
 test("uses a transactional D1 batch for credit debit and ledger entry", async () => {
