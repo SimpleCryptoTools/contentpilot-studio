@@ -48,3 +48,8 @@ ORDER BY type, name;
 ```
 
 Do not run schema migrations or destructive SQL as part of this inspection.
+
+
+## Retention decision register
+
+See [DATA_RETENTION_REVIEW.md](./DATA_RETENTION_REVIEW.md) for the consolidated inventory and unresolved decisions. It intentionally does not invent retention periods or claim that the production schema, backups or provider logs have been verified.
