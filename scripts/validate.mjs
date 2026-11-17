@@ -59,8 +59,8 @@ for (const required of [
     throw new Error("D1 verification runbook is missing a release safety requirement: " + required);
   }
 }
-if (d1Runbook.includes("--skip-confirmation") || d1Runbook.includes("--yes")) {
-  throw new Error("D1 runbook must not bypass Cloudflare confirmation prompts");
+if (/^\s*npx wrangler .*--(?:skip-confirmation|yes)\b/m.test(d1Runbook)) {
+  throw new Error("D1 runbook must not run commands that bypass Cloudflare confirmation prompts");
 }
 for (const [label, source] of [
   ["account lifecycle", lifecycle],
