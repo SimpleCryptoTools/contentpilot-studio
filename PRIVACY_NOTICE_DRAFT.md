@@ -13,7 +13,7 @@
 
 ### Prompts and generated content
 - Text and image prompts submitted for generation are sent to the ContentPilot Worker and passed to the configured Cloudflare Workers AI model.
-- Generated text and images are returned to the browser. Saved text drafts and content-calendar entries are stored in that browser's `localStorage`; they are not currently synchronized between devices or stored as account drafts by the application.
+- Generated text and images are returned to the browser. Saved text drafts and content-calendar entries are stored in that browser's `localStorage`; they are not synchronized between devices or stored as account drafts by the application. Product decision for this release: drafts and calendar remain browser-local; clearing browser/site data may permanently remove them, and they do not automatically follow the user to another device.
 - Anyone with access to the same browser profile may be able to access locally saved drafts and calendar entries.
 
 ### Usage and security data
