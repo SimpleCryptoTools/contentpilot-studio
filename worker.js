@@ -516,7 +516,7 @@ export default {
         const email = String(body.email || "").trim().toLowerCase();
         const password = String(body.password || "");
 
-        if (email.length > 254 || password.length > 128 || !email) {
+        if (email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || password.length > 128 || !password) {
           throw httpError(400, "ایمیل یا رمز عبور معتبر نیست.");
         }
 
