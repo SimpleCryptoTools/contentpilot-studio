@@ -228,7 +228,7 @@ process.stdout.write("PASS scheduled auth rate-limit expiry cleanup checks\\n");
 
 const releaseDocs = [
   ["EMAIL_VERIFICATION_DESIGN.md", ["single-use", "SHA-256", "fixed, configured HTTPS confirmation origin"]],
-  ["PASSWORD_RESET_DESIGN.md", ["generic response", "revoke all existing sessions", "single-use"]],
+  ["PASSWORD_RESET_DESIGN.md", ["generic response", "Revoke all existing sessions", "single-use"]],
   ["DATA_RETENTION_REVIEW.md", ["No retention durations are approved", "production D1 schema"]],
   ["OPERATIONS_RUNBOOK.md", ["Never restore over production", "Never log passwords"]],
   ["FRONTEND_EDGE_SECURITY_HEADERS.md", ["GitHub Pages", "frame-ancestors", "unsafe-inline"]],
